@@ -6,15 +6,15 @@ LD 					:= $(TARGET)-ld
 BUILD_DIR			:= build
 
 LOADER   			:= $(BUILD_DIR)/chantage_loader.bin
-LOADER_SOURCES		:= $(shell find src/chantage_loader -name '*.S')
-LOADER_OBJECTS		:= $(LOADER_SOURCES:%.S=$(BUILD_DIR)/%.o)
-LOADER_CFLAGS		:= -EL -mabi=eabi -march=mips2 -mtune=mips2 -Iinclude -ffreestanding -nostdlib -Os
+LOADER_SOURCES		:= $(shell find src/chantage_loader -name '*.c')
+LOADER_OBJECTS		:= $(LOADER_SOURCES:%.c=$(BUILD_DIR)/%.o)
+LOADER_CFLAGS		:= -EL -mabi=eabi -march=mips2 -mtune=mips2 -Iinclude -ffreestanding -nostdlib -O3 -G0
 LOADER_LDFLAGS  	:= -T src/flat_binary.ld
 
 CHANTAGE			:= $(BUILD_DIR)/chantage.elf
 CHANTAGE_SOURCES	:= $(shell find src/chantage -name '*.c')
 CHANTAGE_OBJECTS	:= $(CHANTAGE_SOURCES:%.c=$(BUILD_DIR)/%.o)
-CHANTAGE_CFLAGS		:= -EL -mabi=eabi -march=mips2 -mtune=mips2 -Iinclude -ffreestanding -nostdlib -Os
+CHANTAGE_CFLAGS		:= -EL -mabi=eabi -march=mips2 -mtune=mips2 -Iinclude -ffreestanding -nostdlib -O3 -G0
 CHANTAGE_LDFLAGS 	:= -r -T src/elf.ld
 
 .PHONY: all
