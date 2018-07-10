@@ -1,9 +1,7 @@
-void _start(void)
-{
+int foo[0x1000];
 
-}
-
-int add(int a, int b)
+void _start()
 {
-    return a + b;
+    foo[0x500] = 0xffff;
+    return;
 }

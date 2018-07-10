@@ -1,28 +1,48 @@
-CC				:= clang
-TARGET			:= mipsel-none-elf
-LD				:= $(TARGET)-ld
+TARGET				:= mipsel-unknown-elf
+AS 					:= $(TARGET)-as
+CC					:= $(TARGET)-gcc
+LD 					:= $(TARGET)-ld
 
-CFLAGS			:= --target=$(TARGET) -march=mips32r2 -mtune=mips32r2 -ffreestanding -nostdlib -Os
-LDFLAGS			:= -T src/chantage/chantage.ld
-OBJ_DIR			:= build
-SRC_DIR			:= src/chantage
-CHANTAGE_ELF	:= $(BUILD_DIR)/chantage.elf
-CHANTAGE_BIN	:= $(BUILD_DIR)/chantage.bin
+BUILD_DIR			:= build
 
+LOADER   			:= $(BUILD_DIR)/chantage_loader.bin
+LOADER_SOURCES		:= $(shell find src/chantage_loader -name '*.S')
+LOADER_OBJECTS		:= $(LOADER_SOURCES:%.S=$(BUILD_DIR)/%.o)
+LOADER_CFLAGS		:= -EL -mabi=eabi -march=mips2 -mtune=mips2 -Iinclude -ffreestanding -nostdlib -Os
+LOADER_LDFLAGS  	:= -T src/flat_binary.ld
 
-_SRCS	:= start.c
-SRCS 	:= $(patsubst %,$(SRC_DIR)/%,$(_SRCS))
-OBJS 	:= $(patsubst %,$(OBJ_DIR)/%,$(_SRCS:c=o))
+CHANTAGE			:= $(BUILD_DIR)/chantage.elf
+CHANTAGE_SOURCES	:= $(shell find src/chantage -name '*.c')
+CHANTAGE_OBJECTS	:= $(CHANTAGE_SOURCES:%.c=$(BUILD_DIR)/%.o)
+CHANTAGE_CFLAGS		:= -EL -mabi=eabi -march=mips2 -mtune=mips2 -Iinclude -ffreestanding -nostdlib -Os
+CHANTAGE_LDFLAGS 	:= -r -T src/elf.ld
 
 .PHONY: all
-all: $(CHANTAGE_BIN)
+all: $(LOADER) $(CHANTAGE)
 
+.PHONY: clean
+clean:
+	rm -rf $(LOADER_OBJECTS)
 
-$(CHANTAGE_BIN): $(CHANTAGE_ELF)
+.PHONY: mrproper
+mrproper:
+	rm -rf $(BUILD_DIR)
 
-$(CHANTAGE_ELF): $(OBJS)
-	$(LD) $(LDFLAGS) -o $<
+.PHONY: re
+re: mrproper all
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-	@mkdir -p $(OBJ_DIR)
-	$(CC) $(CFLAGS) -c -o $@ $<
+$(LOADER): $(LOADER_OBJECTS)
+	@mkdir -p $(dir $@)
+	$(LD) $(LOADER_LDFLAGS) $(LOADER_OBJECTS) -o $@
+
+$(CHANTAGE): $(CHANTAGE_OBJECTS)
+	@mkdir -p $(dir $@)
+	$(LD) $(CHANTAGE_LDFLAGS) $(CHANTAGE_OBJECTS) -o $@
+
+$(BUILD_DIR)/%.o: %.S
+	@mkdir -p $(dir $@)
+	$(CC) $(LOADER_CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/%.o: %.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CHANTAGE_CFLAGS) -c $< -o $@
