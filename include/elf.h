@@ -164,14 +164,29 @@ typedef struct {
 } Elf32_Dyn;
 
 /* The following are used with relocations */
-#define ELF32_R_SYM(x) ((x) >> 8)
-#define ELF32_R_TYPE(x) ((x) & 0xff)
+#define ELF32_R_ADDR_BASE(i)    (((i) >> 16) & 0xFF)
+#define ELF32_R_OFS_BASE(i)     (((i) >> 8) & 0xFF)
+#define ELF32_R_TYPE(i)         (i & 0xFF)
+
+#define R_MIPS_NONE     0
+#define R_MIPS_16       1
+#define R_MIPS_32       2
+#define R_MIPS_REL32    3
+#define R_MIPS_26       4
+#define R_MIPS_HI16     5
+#define R_MIPS_LO16     6
+#define R_MIPS_GPREL16  7
+#define R_MIPS_LITERAL  8
+#define R_MIPS_GOT16    9
+#define R_MIPS_PC16     10
+#define R_MIPS_CALL16   11
+#define R_MIPS_GPREL32  12
 
 typedef struct elf32_rel
 {
     Elf32_Addr  r_offset;
     Elf32_Word  r_info;
-} Elf32_Rel;
+} __attribute__ ((packed)) Elf32_Rel;
 
 typedef struct elf32_rela
 {
@@ -226,7 +241,7 @@ typedef struct elf32_phdr
     Elf32_Word  p_memsz;
     Elf32_Word  p_flags;
     Elf32_Word  p_align;
-} Elf32_Phdr;
+} __attribute__ ((packed)) Elf32_Phdr;
 
 /* sh_type */
 #define SHT_NULL    0
@@ -276,7 +291,7 @@ typedef struct elf32_shdr {
     Elf32_Word  sh_info;
     Elf32_Word  sh_addralign;
     Elf32_Word  sh_entsize;
-} Elf32_Shdr;
+} __attribute__ ((packed)) Elf32_Shdr;
 
 #define EI_MAG0     0       /* e_ident[] indexes */
 #define EI_MAG1     1

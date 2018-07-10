@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <elf.h>
 
-#define CHANTAGE_PATH   "ms0:/PSP/GAME/ULUS10297/chantage.elf"
+#define CHANTAGE_PATH   "ms0:/PSP/GAME/ULUS10297/chantage.prx"
 
 #define SCE_O_RDONLY    0x01
 

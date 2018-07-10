@@ -1,28 +1,28 @@
 TARGET				:= mipsel-unknown-elf
-AS 					:= $(TARGET)-as
 CC					:= $(TARGET)-gcc
 LD 					:= $(TARGET)-ld
+PSP_PRXGEN			:= psp-prxgen
 
 BUILD_DIR			:= build
+CFLAGS				:= -EL -mabi=eabi -march=mips2 -mtune=mips2 -Iinclude -ffreestanding -nostdlib -Os -G0 -MMD
 
 LOADER   			:= $(BUILD_DIR)/chantage_loader.bin
 LOADER_SOURCES		:= $(shell find src/chantage_loader -name '*.c')
-LOADER_OBJECTS		:= $(LOADER_SOURCES:%.c=$(BUILD_DIR)/%.o)
-LOADER_CFLAGS		:= -EL -mabi=eabi -march=mips2 -mtune=mips2 -Iinclude -ffreestanding -nostdlib -O3 -G0
+LOADER_OBJECTS		:= $(LOADER_SOURCES:%=$(BUILD_DIR)/%.o)
 LOADER_LDFLAGS  	:= -T src/flat_binary.ld
 
-CHANTAGE			:= $(BUILD_DIR)/chantage.elf
+CHANTAGE 			:= $(BUILD_DIR)/chantage.prx
+CHANTAGE_ELF		:= $(BUILD_DIR)/chantage.elf
 CHANTAGE_SOURCES	:= $(shell find src/chantage -name '*.c')
-CHANTAGE_OBJECTS	:= $(CHANTAGE_SOURCES:%.c=$(BUILD_DIR)/%.o)
-CHANTAGE_CFLAGS		:= -EL -mabi=eabi -march=mips2 -mtune=mips2 -Iinclude -ffreestanding -nostdlib -O3 -G0
-CHANTAGE_LDFLAGS 	:= -r -T src/elf.ld
+CHANTAGE_OBJECTS	:= $(CHANTAGE_SOURCES:%=$(BUILD_DIR)/%.o)
+CHANTAGE_LDFLAGS 	:= -q -T src/elf.ld
 
 .PHONY: all
 all: $(LOADER) $(CHANTAGE)
 
 .PHONY: clean
 clean:
-	rm -rf $(LOADER_OBJECTS)
+	rm -rf $(LOADER_OBJECTS) $(CHANTAGE_OBJECTS)
 
 .PHONY: mrproper
 mrproper:
@@ -35,14 +35,14 @@ $(LOADER): $(LOADER_OBJECTS)
 	@mkdir -p $(dir $@)
 	$(LD) $(LOADER_LDFLAGS) $(LOADER_OBJECTS) -o $@
 
-$(CHANTAGE): $(CHANTAGE_OBJECTS)
+$(CHANTAGE): $(CHANTAGE_ELF)
+	@mkdir -p $(dir $@)
+	$(PSP_PRXGEN) $< $@
+
+$(CHANTAGE_ELF): $(CHANTAGE_OBJECTS)
 	@mkdir -p $(dir $@)
 	$(LD) $(CHANTAGE_LDFLAGS) $(CHANTAGE_OBJECTS) -o $@
 
-$(BUILD_DIR)/%.o: %.S
+$(BUILD_DIR)/%.c.o: %.c
 	@mkdir -p $(dir $@)
-	$(CC) $(LOADER_CFLAGS) -c $< -o $@
-
-$(BUILD_DIR)/%.o: %.c
-	@mkdir -p $(dir $@)
-	$(CC) $(CHANTAGE_CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@

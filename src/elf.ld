@@ -1,19 +1,18 @@
+ENTRY(_start)
 SECTIONS
 {
+    . = 0x0;
+
     .text : SUBALIGN(0x4) {
         * ( .text )
-    }
-
-    .bss : SUBALIGN(0x4) {
+        * ( .data )
+        * ( .rodata )
+        * (COMMON)
         * ( .bss )
     }
 
-    .data : SUBALIGN(0x4) {
-        * ( .data )
-    }
-
-    .rodata : SUBALIGN(0x4) {
-        * ( .rodata )
+    .rel.text : SUBALIGN(0x4) {
+        * ( .rel.text )
     }
 
     /DISCARD/ : {
