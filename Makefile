@@ -4,6 +4,7 @@ LD 					:= $(TARGET)-ld
 PSP_PRXGEN			:= psp-prxgen
 
 BUILD_DIR			:= build
+DIST_DIR 			:= dist
 CFLAGS				:= -EL -mabi=eabi -march=mips2 -mtune=mips2 -Iinclude -ffreestanding -nostdlib -Os -G0 -MMD
 
 LOADER   			:= $(BUILD_DIR)/chantage_loader.bin
@@ -19,6 +20,13 @@ CHANTAGE_LDFLAGS 	:= -q -T src/elf.ld
 
 .PHONY: all
 all: $(LOADER) $(CHANTAGE)
+
+.PHONY: dist
+dist: all
+	@mkdir -p $(DIST_DIR)/chantage
+	cp $(CHANTAGE) $(LOADER) $(DIST_DIR)/chantage
+	zip -r $(DIST_DIR)/chantage.zip $(DIST_DIR)/chantage
+	rm -rf $(DIST_DIR)/chantage
 
 .PHONY: clean
 clean:

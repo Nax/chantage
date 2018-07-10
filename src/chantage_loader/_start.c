@@ -52,10 +52,10 @@ void* _start()
 
         relCount = shdr.sh_size / sizeof(Elf32_Rel);
         sceIoLseek(fd, shdr.sh_offset, SEEK_SET);
+        hiPtr = 0;
+        hiSolved = 0;
         for (size_t j = 0; j < relCount; ++j)
         {
-            hiPtr = 0;
-            hiSolved = 0;
             sceIoRead(fd, &rel, sizeof(Elf32_Rel));
             relOff = segments[ELF32_R_OFS_BASE(rel.r_info)] + rel.r_offset;
             relVal = (uint32_t)segments[ELF32_R_ADDR_BASE(rel.r_info)];
