@@ -78,6 +78,11 @@ void* prxLoad(SceUID fd)
                     }
                     *((uint16_t*)relOff) = (relVal & 0xffff);
                     break;
+                case R_MIPS_26:
+                    addend = (*((uint32_t*)relOff) & 0x3ffffff) << 2;
+                    relVal += addend;
+                    *((uint32_t*)relOff) = (*((uint32_t*)relOff) & 0xfc000000) | ((relVal >> 2) & 0x3ffffff);
+                    break;
             }
         }
     }
