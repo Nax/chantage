@@ -72,6 +72,11 @@ void* _start()
                     relVal += addend;
                     if (!hiSolved)
                     {
+                        /* LO16 is signed, so we may need to adjust the HI16 accordingly */
+                        if (relVal & 0x8000)
+                        {
+                            relVal += 0x10000;
+                        }
                         *((uint16_t*)hiPtr) = (relVal >> 16);
                         hiSolved = 1;
                     }
