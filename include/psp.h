@@ -1,10 +1,8 @@
-#ifndef CHANTAGE_LOADER_H
-#define CHANTAGE_LOADER_H
+#ifndef PSP_H
+#define PSP_H
 
 #include <stddef.h>
 #include <stdint.h>
-#include <elf.h>
-
 
 #define SCE_O_RDONLY    0x01
 
@@ -26,9 +24,15 @@ static const pfnSceIoClose  sceIoClose  = (void*)0x08a4af4c;
 static const pfnSceIoOpen   sceIoOpen   = (void*)0x08a4af6c;
 static const pfnSceIoLseek  sceIoLseek  = (void*)0x08a4af74;
 
-void*   malloc(size_t size);
-void    free(void* ptr);
+typedef void* (*pfn_malloc_r)(const void* reent, size_t size);
+typedef void  (*pfn_free_r)(const void* reent, void* ptr);
 
-void elfParseHeader(Elf32_Ehdr* ehdr, SceUID file);
+static const pfn_malloc_r   _malloc_r = (void*)(0x0880bd40);
+static const pfn_free_r     _free_r =   (void*)(0x0880ad24);
+
+static const void* sReent = (void*)0x08a71f38;
+
+#define malloc(sz)  (_malloc_r(sReent, sz))
+#define free(ptr)   (_free_r(sReent, ptr))
 
 #endif
