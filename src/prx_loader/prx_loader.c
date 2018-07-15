@@ -66,6 +66,10 @@ void* prxLoad(SceUID fd)
                     relVal += *(uint32_t*)relOff;
                     *(uint32_t*)relOff = (uint32_t)relVal;
                     break;
+                case R_MIPS_REL32:
+                    relVal += *(uint32_t*)relOff;
+                    *(uint32_t*)relOff = (uint32_t)relVal - (uint32_t)relOff;
+                    break;
                 case R_MIPS_26:
                     relVal += (*((uint32_t*)relOff) & 0x3ffffff) << 2;
                     *((uint32_t*)relOff) = (*((uint32_t*)relOff) & 0xfc000000) | ((relVal >> 2) & 0x3ffffff);
