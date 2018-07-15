@@ -1,5 +1,9 @@
 #include <chantage/chantage.h>
 
+static uint8_t gTitleText[] = {
+#include "title_text.inc"
+};
+
 typedef struct
 {
     uint32_t    enabled;
@@ -24,6 +28,25 @@ static const pfnLoadTextureDescriptor LoadTextureDescriptor = (pfnLoadTextureDes
 static const pfn_Unk08833d40 _Unk08833d40 = (pfn_Unk08833d40)0x08833d40;
 static const pfn_Unk08833a80 _Unk08833a80 = (pfn_Unk08833a80)0x08833a80;
 
+static void DrawTitleText()
+{
+    uint8_t* base;
+    uint8_t value;
+
+    base = (uint8_t*)0x09b27190;
+    for (uint32_t j = 0; j < 16; ++j)
+    {
+        for (uint32_t i = 0; i < 128; ++i)
+        {
+            value = gTitleText[i + j * 128];
+            if (value)
+            {
+                base[i + 20 + 512 * (j + 20)] = value;
+            }
+        }
+    }
+}
+
 uint32_t SetupTitleScreen(uint32_t unkArg)
 {
     TextureDescriptor* desc;
@@ -38,6 +61,8 @@ uint32_t SetupTitleScreen(uint32_t unkArg)
 
     uint32_t x;
     uint32_t y;
+
+    DrawTitleText();
 
     tmpPtr = (uint32_t*)0x092efb74;
     *tmpPtr = ((*tmpPtr) & 0xffffdfff) | 0x00001000;
@@ -102,9 +127,9 @@ uint32_t SetupTitleScreen(uint32_t unkArg)
                 desc->y = 0xde;
                 break;
             case 3:
-                desc->textureID = 3;
-                desc->x = 0x10;
-                desc->y = 0x10;
+                desc->textureID = 6;
+                desc->x = 0x00;
+                desc->y = 0x00;
                 break;
         }
     }
