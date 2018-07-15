@@ -5,7 +5,6 @@ LD					:= $(TARGET)-ld
 PSP_PRXGEN			:= psp-prxgen
 
 BUILD_DIR			:= build
-DIST_DIR			:= dist
 CFLAGS				:= -EL -mabi=eabi -march=mips2 -mtune=mips2 -Iinclude -ffreestanding -nostdlib -Os -G0 -MMD
 
 PRX_LOADER 			:= $(BUILD_DIR)/lib/libprxloader.a
@@ -23,13 +22,17 @@ CHANTAGE_SOURCES	:= $(shell find src/chantage -name '*.c')
 CHANTAGE_OBJECTS	:= $(CHANTAGE_SOURCES:%=$(BUILD_DIR)/%.o)
 CHANTAGE_LDFLAGS	:= -q -T src/elf.ld
 
-SLOWDOWN			:= $(BUILD_DIR)/mods/slowdown.prx
-SLOWDOWN_ELF		:= $(BUILD_DIR)/mods/slowdown.elf
+SLOWDOWN			:= $(BUILD_DIR)/mods/slowdown_fix.prx
+SLOWDOWN_ELF		:= $(BUILD_DIR)/mods/slowdown_fix.elf
 SLOWDOWN_SOURCES	:= src/slowdown.c
 SLOWDOWN_OBJECTS	:= $(BUILD_DIR)/src/slowdown.c.o
 SLOWDOWN_LDFLAGS	:= $(CHANTAGE_LDFLAGS)
 
+DIST_DIR			:= dist
 DIST				:= $(DIST_DIR)/chantage.zip
+DIST_TMP 			:= $(DIST_DIR)/tmp
+DIST_PSPDIR			:= $(DIST_TMP)/PSP/GAME/ULUS10297
+DIST_MODSDIR		:= $(DIST_PSPDIR)/mods
 
 .PHONY: all
 all: $(LOADER) $(CHANTAGE) $(SLOWDOWN)
@@ -38,12 +41,14 @@ all: $(LOADER) $(CHANTAGE) $(SLOWDOWN)
 dist: $(DIST)
 
 $(DIST): $(LOADER) $(CHANTAGE) $(SLOWDOWN)
-	@mkdir -p $(DIST_DIR)/chantage/mods
+	@mkdir -p $(DIST_MODSDIR)
 	rm -rf $(DIST)
-	cp $(CHANTAGE) $(LOADER) $(DIST_DIR)/chantage
-	cp $(SLOWDOWN) $(DIST_DIR)/chantage/mods
-	zip -r $(DIST_DIR)/chantage.zip $(DIST_DIR)/chantage
-	rm -rf $(DIST_DIR)/chantage
+	cp chantage.ppf $(DIST_TMP)
+	cp $(CHANTAGE) $(LOADER) $(DIST_PSPDIR)
+	cp $(SLOWDOWN) $(DIST_MODSDIR)
+	ls -1 $(DIST_MODSDIR) > $(DIST_PSPDIR)/mods.txt
+	cd $(DIST_TMP) && zip -r ../chantage.zip PSP chantage.ppf
+	rm -rf $(DIST_TMP)
 
 .PHONY: clean
 clean:
