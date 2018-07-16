@@ -15,7 +15,6 @@ void* prxLoad(SceUID fd)
     uint32_t relVal;
     char* hiPtr;
     int hiSolved;
-    uint32_t addend;
 
     segCount = 0;
     sceIoRead(fd, &ehdr, sizeof(ehdr));
@@ -59,13 +58,28 @@ void* prxLoad(SceUID fd)
             {
                 case R_MIPS_NONE:
                     break;
+                case R_MIPS_16:
+                    relVal += *(uint16_t*)relOff;
+                    *(uint16_t*)relOff = (uint16_t)relVal;
+                    break;
+                case R_MIPS_32:
+                    relVal += *(uint32_t*)relOff;
+                    *(uint32_t*)relOff = (uint32_t)relVal;
+                    break;
+                case R_MIPS_REL32:
+                    relVal += *(uint32_t*)relOff;
+                    *(uint32_t*)relOff = (uint32_t)relVal - (uint32_t)relOff;
+                    break;
+                case R_MIPS_26:
+                    relVal += (*((uint32_t*)relOff) & 0x3ffffff) << 2;
+                    *((uint32_t*)relOff) = (*((uint32_t*)relOff) & 0xfc000000) | ((relVal >> 2) & 0x3ffffff);
+                    break;
                 case R_MIPS_HI16:
                     hiPtr = relOff;
                     hiSolved = 0;
                     break;
                 case R_MIPS_LO16:
-                    addend = ((*(uint16_t*)hiPtr) << 16) | (*(uint16_t*)relOff);
-                    relVal += addend;
+                    relVal += ((*(uint16_t*)hiPtr) << 16) | (*(uint16_t*)relOff);
                     if (!hiSolved)
                     {
                         /* LO16 is signed, so we may need to adjust the HI16 accordingly */
@@ -77,11 +91,6 @@ void* prxLoad(SceUID fd)
                         hiSolved = 1;
                     }
                     *((uint16_t*)relOff) = (relVal & 0xffff);
-                    break;
-                case R_MIPS_26:
-                    addend = (*((uint32_t*)relOff) & 0x3ffffff) << 2;
-                    relVal += addend;
-                    *((uint32_t*)relOff) = (*((uint32_t*)relOff) & 0xfc000000) | ((relVal >> 2) & 0x3ffffff);
                     break;
             }
         }
