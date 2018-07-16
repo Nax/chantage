@@ -1,4 +1,4 @@
-TARGET				:= mipsel-unknown-elf
+TARGET				:= mips-unknown-elf
 AR 					:= $(TARGET)-ar
 CC					:= $(TARGET)-gcc
 LD					:= $(TARGET)-ld
@@ -20,7 +20,7 @@ CHANTAGE			:= $(BUILD_DIR)/chantage.prx
 CHANTAGE_ELF		:= $(BUILD_DIR)/chantage.elf
 CHANTAGE_SOURCES	:= $(shell find src/chantage -name '*.c')
 CHANTAGE_OBJECTS	:= $(CHANTAGE_SOURCES:%=$(BUILD_DIR)/%.o)
-CHANTAGE_LDFLAGS	:= -q -T src/elf.ld
+CHANTAGE_LDFLAGS	:= -EL -q -T src/elf.ld
 
 SLOWDOWN			:= $(BUILD_DIR)/mods/slowdown_fix.prx
 SLOWDOWN_ELF		:= $(BUILD_DIR)/mods/slowdown_fix.elf
