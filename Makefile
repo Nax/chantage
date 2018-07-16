@@ -5,7 +5,7 @@ LD					:= $(TARGET)-ld
 PSP_PRXGEN			:= psp-prxgen
 
 BUILD_DIR			:= build
-CFLAGS				:= -EL -mabi=eabi -march=mips2 -mtune=mips2 -Iinclude -ffreestanding -nostdlib -Os -G0 -MMD
+CFLAGS				:= -EL -mabi=eabi -march=mips2 -mtune=mips2 -Iinclude -ffreestanding -nostdlib -Os -MMD
 
 PRX_LOADER 			:= $(BUILD_DIR)/lib/libprxloader.a
 PRX_LOADER_SOURCES	:= $(shell find src/prx_loader -name '*.c')
