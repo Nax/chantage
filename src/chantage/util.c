@@ -14,4 +14,5 @@ void ReplaceFunction(void* existingFunction, void* newFunction)
      */
     dst[0] = 0x08000000 | ((src >> 2) & 0x3ffffff);
     dst[1] = 0x00000000;
+    sceKernelDcacheWritebackRange(dst, 8);
 }
