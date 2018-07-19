@@ -3,6 +3,7 @@
 void* prxLoad(SceUID fd)
 {
     char* segments[32];
+    size_t segSize[32];
     char* tmp;
     size_t segCount;
     size_t relCount;
@@ -33,7 +34,9 @@ void* prxLoad(SceUID fd)
         sceIoRead(fd, tmp, phdr.p_filesz);
         for (Elf32_Word i = phdr.p_filesz; i < phdr.p_memsz; ++i)
             tmp[i] = 0;
-        segments[segCount++] = tmp;
+        segments[segCount] = tmp;
+        segSize[segCount] = phdr.p_memsz;
+        segCount++;
     }
 
     /* Load the relocs */
@@ -95,5 +98,8 @@ void* prxLoad(SceUID fd)
             }
         }
     }
+
+    for (size_t i = 0; i < segCount; ++i)
+        sceKernelDcacheWritebackRange(segments[i], segSize[i]);
     return segments[0] + ehdr.e_entry;
 }

@@ -4,7 +4,6 @@
 
 void* _start() __attribute__ ((section(".text.start")));
 
-
 void* _start()
 {
     SceUID fd;
