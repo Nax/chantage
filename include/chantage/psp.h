@@ -48,15 +48,11 @@ static const PFNSTRCPYPROC* strcpy = (const PFNSTRCPYPROC*)0x0880f880;
 static const PFNSTRLENPROC* strlen = (const PFNSTRLENPROC*)0x0880f940;
 
 typedef void* (PFNMEMCHRPROC)(const void*, int, size_t);
-typedef int (PFNMEMCMPPROC)(const void*, const void*, size_t);
-typedef void* (PFNMEMCPYPROC)(void*, const void*, size_t);
-typedef void* (PFNMEMMOVEPROC)(void*, const void*, size_t);
-typedef void* (PFNMEMSETPROC)(void*, int, size_t);
-
 static const PFNMEMCHRPROC* memchr = (const PFNMEMCHRPROC*)0x0880c540;
-static const PFNMEMCMPPROC* memcmp = (const PFNMEMCMPPROC*)0x0880c640;
-static const PFNMEMCPYPROC* memcpy = (const PFNMEMCPYPROC*)0x0880c700;
-static const PFNMEMMOVEPROC* memmove = (const PFNMEMMOVEPROC*)0x0880c840;
-static const PFNMEMSETPROC* memset = (const PFNMEMSETPROC*)0x0880cb80;
+
+void*   memset(void*, int, size_t);
+void*   memmove(void*, const void*, size_t);
+int     memcmp(const void*, const void*, size_t);
+void*   memcpy(void* dst, const void* src, size_t len);
 
 #endif

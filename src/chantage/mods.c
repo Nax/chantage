@@ -1,5 +1,5 @@
-#include <chantage/chantage.h>
-#include <prx/prx.h>
+#include <chantage/impl.h>
+#include <chantage/prx.h>
 
 #define BASE_PATH       "ms0:/PSP/COMMON/ULUS10297/"
 
@@ -19,7 +19,7 @@ void LoadMods()
 
     SceUID fdMods;
     SceUID fd;
-    void (*modPtr)();
+    Mod* mod;
 
     fdMods = sceIoOpen(sModsTxtPath, SCE_O_RDONLY, 0777);
     buffer = malloc(0x8000);
@@ -54,9 +54,9 @@ void LoadMods()
             }
             strBuffer[i + j] = 0;
             fd = sceIoOpen(strBuffer, SCE_O_RDONLY, 0777);
-            modPtr = prxLoad(fd);
+            mod = prxLoad(fd);
             sceIoClose(fd);
-            modPtr();
+            mod(&LoadFunction);
         }
         for (;;)
         {

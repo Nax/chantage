@@ -1,4 +1,4 @@
-#include <prx/prx.h>
+#include <chantage/prx.h>
 
 void* prxLoad(SceUID fd)
 {
@@ -15,6 +15,7 @@ void* prxLoad(SceUID fd)
     char* relOff;
     uint32_t relVal;
     char* hiPtr;
+    uint16_t hiVal;
     int hiSolved;
 
     segCount = 0;
@@ -29,7 +30,7 @@ void* prxLoad(SceUID fd)
         if (phdr.p_type != PT_LOAD)
             continue;
 
-        tmp = malloc(phdr.p_memsz);
+        tmp = malloc(phdr.p_memsz + 0xfff);
         sceIoLseek(fd, phdr.p_offset, SEEK_SET);
         sceIoRead(fd, tmp, phdr.p_filesz);
         for (Elf32_Word i = phdr.p_filesz; i < phdr.p_memsz; ++i)
@@ -79,10 +80,11 @@ void* prxLoad(SceUID fd)
                     break;
                 case R_MIPS_HI16:
                     hiPtr = relOff;
+                    hiVal = *(uint16_t*)hiPtr;
                     hiSolved = 0;
                     break;
                 case R_MIPS_LO16:
-                    relVal += ((*(uint16_t*)hiPtr) << 16) | (*(uint16_t*)relOff);
+                    relVal += (hiVal << 16) | (*(uint16_t*)relOff);
                     if (!hiSolved)
                     {
                         /* LO16 is signed, so we may need to adjust the HI16 accordingly */
