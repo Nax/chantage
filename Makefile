@@ -1,41 +1,47 @@
-TARGET				:= mips-unknown-elf
-AR 					:= $(TARGET)-ar
-CC					:= $(TARGET)-gcc
-LD					:= $(TARGET)-ld
-PSP_PRXGEN			:= psp-prxgen
+TARGET					:= mips-unknown-elf
+AR						:= $(TARGET)-ar
+CC						:= $(TARGET)-gcc
+LD						:= $(TARGET)-ld
+PSP_PRXGEN				:= psp-prxgen
 
-BUILD_DIR			:= build
-CFLAGS				:= -EL -mabi=eabi -march=mips2 -Iinclude -ffreestanding -nostdlib -Os -MMD
+BUILD_DIR				:= build
+CFLAGS					:= -EL -mabi=eabi -march=mips2 -Iinclude -Isrc -ffreestanding -nostdlib -Os -MMD -pipe
+LDFLAGS 				:= -L$(BUILD_DIR)/lib
+ARFLAGS					:= rcs
 
-PRX_LOADER 			:= $(BUILD_DIR)/lib/libprxloader.a
-PRX_LOADER_SOURCES	:= $(shell find src/prx_loader -name '*.c')
-PRX_LOADER_OBJECTS	:= $(PRX_LOADER_SOURCES:%=$(BUILD_DIR)/%.o)
+DEPS					:= $(shell find $(BUILD_DIR) -name '*.d' 2>/dev/null)
 
-LOADER				:= $(BUILD_DIR)/chantage_loader.bin
-LOADER_SOURCES		:= $(shell find src/chantage_loader -name '*.c')
-LOADER_OBJECTS		:= $(LOADER_SOURCES:%=$(BUILD_DIR)/%.o)
-LOADER_LDFLAGS		:= -T src/flat_binary.ld
+LIBCHANTAGE				:= $(BUILD_DIR)/lib/libchantage.a
+LIBCHANTAGE_OBJECTS		:= $(BUILD_DIR)/src/libchantage.S.o
 
-CHANTAGE			:= $(BUILD_DIR)/chantage.prx
-CHANTAGE_ELF		:= $(BUILD_DIR)/chantage.elf
-CHANTAGE_SOURCES	:= $(shell find src/chantage -name '*.c' -o -name '*.S')
-CHANTAGE_OBJECTS	:= $(CHANTAGE_SOURCES:%=$(BUILD_DIR)/%.o)
-CHANTAGE_LDFLAGS	:= -Xlinker -q -T src/elf.ld
+LIBPRXLOADER			:= $(BUILD_DIR)/lib/libprxloader.a
+LIBPRXLOADER_OBJECTS	:= $(BUILD_DIR)/src/prx_loader.c.o
 
-SLOWDOWN			:= $(BUILD_DIR)/mods/slowdown_fix.prx
-SLOWDOWN_ELF		:= $(BUILD_DIR)/mods/slowdown_fix.elf
-SLOWDOWN_SOURCES	:= src/slowdown.c
-SLOWDOWN_OBJECTS	:= $(BUILD_DIR)/src/slowdown.c.o
-SLOWDOWN_LDFLAGS	:= $(CHANTAGE_LDFLAGS)
+LOADER					:= $(BUILD_DIR)/chantage_loader.bin
+LOADER_OBJECTS			:= $(BUILD_DIR)/src/chantage_loader.c.o
+LOADER_LDFLAGS			:= $(LDFLAGS) -T src/flat_binary.ld
 
-DIST_DIR			:= dist
-DIST				:= $(DIST_DIR)/chantage.zip
-DIST_TMP 			:= $(DIST_DIR)/tmp
-DIST_PSPDIR			:= $(DIST_TMP)/PSP/COMMON/ULUS10297
-DIST_MODSDIR		:= $(DIST_PSPDIR)/mods
+CHANTAGE				:= $(BUILD_DIR)/chantage.prx
+CHANTAGE_ELF			:= $(BUILD_DIR)/chantage.elf
+CHANTAGE_SOURCES		:= $(shell find src/chantage -name '*.c' -o -name '*.S')
+CHANTAGE_OBJECTS		:= $(CHANTAGE_SOURCES:%=$(BUILD_DIR)/%.o)
+CHANTAGE_LDFLAGS		:= $(LDFLAGS) -Xlinker -q -T src/elf.ld
+
+SLOWDOWN				:= $(BUILD_DIR)/mods/slowdown_fix.prx
+SLOWDOWN_ELF			:= $(BUILD_DIR)/mods/slowdown_fix.elf
+SLOWDOWN_OBJECTS		:= $(BUILD_DIR)/src/slowdown.c.o
+SLOWDOWN_LDFLAGS		:= $(CHANTAGE_LDFLAGS)
+
+DIST_DIR				:= dist
+DIST					:= $(DIST_DIR)/chantage.zip
+DIST_TMP				:= $(DIST_DIR)/tmp
+DIST_PSPDIR				:= $(DIST_TMP)/PSP/COMMON/ULUS10297
+DIST_MODSDIR			:= $(DIST_PSPDIR)/mods
 
 .PHONY: all
 all: $(LOADER) $(CHANTAGE) $(SLOWDOWN)
+
+-include $(DEPS)
 
 .PHONY: dist
 dist: $(DIST)
@@ -61,29 +67,33 @@ mrproper:
 .PHONY: re
 re: mrproper all
 
-$(PRX_LOADER): $(PRX_LOADER_OBJECTS)
+$(LIBPRXLOADER): $(LIBPRXLOADER_OBJECTS)
 	@mkdir -p $(dir $@)
-	$(AR) rcs $@ $(PRX_LOADER_OBJECTS)
+	$(AR) $(ARFLAGS) $@ $(LIBPRXLOADER_OBJECTS)
 
-$(LOADER): $(LOADER_OBJECTS) $(PRX_LOADER)
+$(LOADER): $(LOADER_OBJECTS) $(LIBPRXLOADER) $(LIBCHANTAGE)
 	@mkdir -p $(dir $@)
-	$(LD) $(LOADER_LDFLAGS) $(LOADER_OBJECTS) -L$(BUILD_DIR)/lib -lprxloader -o $@
+	$(LD) $(LOADER_LDFLAGS) $(LOADER_OBJECTS) -L$(BUILD_DIR)/lib -lprxloader -lchantage -o $@
 
 $(CHANTAGE): $(CHANTAGE_ELF)
 	@mkdir -p $(dir $@)
 	$(PSP_PRXGEN) $< $@
 
-$(CHANTAGE_ELF): $(CHANTAGE_OBJECTS) $(PRX_LOADER)
+$(CHANTAGE_ELF): $(CHANTAGE_OBJECTS) $(LIBPRXLOADER) $(LIBCHANTAGE)
 	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) $(CHANTAGE_LDFLAGS) $(CHANTAGE_OBJECTS) -L$(BUILD_DIR)/lib -lprxloader -lgcc -o $@
+	$(CC) $(CFLAGS) $(CHANTAGE_LDFLAGS) $(CHANTAGE_OBJECTS) -L$(BUILD_DIR)/lib -lprxloader -lchantage -lgcc -o $@
 
 $(SLOWDOWN): $(SLOWDOWN_ELF)
 	@mkdir -p $(dir $@)
 	$(PSP_PRXGEN) $< $@
 
-$(SLOWDOWN_ELF): $(SLOWDOWN_OBJECTS)
+$(SLOWDOWN_ELF): $(SLOWDOWN_OBJECTS) $(LIBCHANTAGE)
 	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) $(SLOWDOWN_LDFLAGS) $(SLOWDOWN_OBJECTS) -lgcc -o $@
+	$(CC) $(CFLAGS) $(SLOWDOWN_LDFLAGS) $(SLOWDOWN_OBJECTS) -lchantage -lgcc -o $@
+
+$(LIBCHANTAGE): $(LIBCHANTAGE_OBJECTS)
+	@mkdir -p $(dir $@)
+	$(AR) $(ARFLAGS) $@ $(LIBCHANTAGE_OBJECTS)
 
 $(BUILD_DIR)/%.c.o: %.c
 	@mkdir -p $(dir $@)

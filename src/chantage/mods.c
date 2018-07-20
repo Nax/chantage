@@ -1,5 +1,5 @@
 #include <chantage/chantage.h>
-#include <prx/prx.h>
+#include <chantage/prx.h>
 
 #define BASE_PATH       "ms0:/PSP/COMMON/ULUS10297/"
 

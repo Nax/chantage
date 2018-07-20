@@ -1,4 +1,4 @@
-#include "chantage_impl.h"
+#include <chantage/impl.h>
 
 typedef struct {
     size_t      size;

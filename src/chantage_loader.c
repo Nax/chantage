@@ -1,4 +1,4 @@
-#include <prx/prx.h>
+#include <chantage/prx.h>
 
 #define CHANTAGE_PATH   "ms0:/PSP/COMMON/ULUS10297/chantage.prx"
 

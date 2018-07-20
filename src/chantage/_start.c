@@ -1,5 +1,4 @@
-#include "chantage_impl.h"
-#include <chantage/chantage.h>
+#include <chantage/impl.h>
 
 PSP_MODULE_INFO("Chantage", 0, 0, 0);
 
