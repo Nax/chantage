@@ -10,5 +10,4 @@ void ReplaceFunction(void* existingFunction, void* newFunction);
 typedef void* (PFNLOADFUNCTIONPROC)(const char*);
 typedef void* (PFNREGISTERFUNCTIONPROC)(const char*, void*);
 
-
 #endif
