@@ -5,7 +5,7 @@ LD					:= $(TARGET)-ld
 PSP_PRXGEN			:= psp-prxgen
 
 BUILD_DIR			:= build
-CFLAGS				:= -EL -mabi=eabi -march=mips2 -mtune=mips2 -Iinclude -ffreestanding -nostdlib -fno-builtin -Os -MMD
+CFLAGS				:= -EL -mabi=eabi -march=mips2 -Iinclude -ffreestanding -nostdlib -Os -MMD
 
 PRX_LOADER 			:= $(BUILD_DIR)/lib/libprxloader.a
 PRX_LOADER_SOURCES	:= $(shell find src/prx_loader -name '*.c')
@@ -18,9 +18,9 @@ LOADER_LDFLAGS		:= -T src/flat_binary.ld
 
 CHANTAGE			:= $(BUILD_DIR)/chantage.prx
 CHANTAGE_ELF		:= $(BUILD_DIR)/chantage.elf
-CHANTAGE_SOURCES	:= $(shell find src/chantage -name '*.c')
+CHANTAGE_SOURCES	:= $(shell find src/chantage -name '*.c' -o -name '*.S')
 CHANTAGE_OBJECTS	:= $(CHANTAGE_SOURCES:%=$(BUILD_DIR)/%.o)
-CHANTAGE_LDFLAGS	:= -EL -q -T src/elf.ld
+CHANTAGE_LDFLAGS	:= -Xlinker -q -T src/elf.ld
 
 SLOWDOWN			:= $(BUILD_DIR)/mods/slowdown_fix.prx
 SLOWDOWN_ELF		:= $(BUILD_DIR)/mods/slowdown_fix.elf
@@ -75,7 +75,7 @@ $(CHANTAGE): $(CHANTAGE_ELF)
 
 $(CHANTAGE_ELF): $(CHANTAGE_OBJECTS) $(PRX_LOADER)
 	@mkdir -p $(dir $@)
-	$(LD) $(CHANTAGE_LDFLAGS) $(CHANTAGE_OBJECTS) -L$(BUILD_DIR)/lib -lprxloader -o $@
+	$(CC) $(CFLAGS) $(CHANTAGE_LDFLAGS) $(CHANTAGE_OBJECTS) -L$(BUILD_DIR)/lib -lprxloader -lgcc -o $@
 
 $(SLOWDOWN): $(SLOWDOWN_ELF)
 	@mkdir -p $(dir $@)
@@ -83,9 +83,12 @@ $(SLOWDOWN): $(SLOWDOWN_ELF)
 
 $(SLOWDOWN_ELF): $(SLOWDOWN_OBJECTS)
 	@mkdir -p $(dir $@)
-	$(LD) $(SLOWDOWN_LDFLAGS) $(SLOWDOWN_OBJECTS) -o $@
-
+	$(CC) $(CFLAGS) $(SLOWDOWN_LDFLAGS) $(SLOWDOWN_OBJECTS) -lgcc -o $@
 
 $(BUILD_DIR)/%.c.o: %.c
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/%.S.o: %.S
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
