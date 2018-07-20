@@ -1,7 +1,7 @@
 #include <chantage/chantage.h>
 #include <prx/prx.h>
 
-#define BASE_PATH       "ms0:/PSP/GAME/ULUS10297/"
+#define BASE_PATH       "ms0:/PSP/COMMON/ULUS10297/"
 
 static const char* sModsTxtPath = BASE_PATH "mods.txt";
 static const char* sModsDirPath = BASE_PATH "mods/";
@@ -43,7 +43,7 @@ void LoadMods()
         {
             i = 0;
             j = 0;
-            while (i < 29)
+            while (i < 31)
             {
                 strBuffer[i] = sModsDirPath[i];
                 i++;
