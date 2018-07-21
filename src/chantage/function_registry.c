@@ -37,9 +37,6 @@ void InitFunctionRegistry()
     gFunctionRegistry.strTable = malloc(gFunctionRegistry.strCapacity);
     gFunctionRegistry.offTable = malloc(gFunctionRegistry.capacity * sizeof(uint32_t));
     gFunctionRegistry.fnTable = malloc(gFunctionRegistry.capacity * sizeof(void*));
-
-    RegisterFunction("LoadFunction", &LoadFunction);
-    RegisterFunction("RegisterFunction", &RegisterFunction);
 }
 
 void* LoadFunction(const char* str)

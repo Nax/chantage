@@ -4,6 +4,10 @@
 #include <stddef.h>
 #include <stdint.h>
 
+/*
+ * LibChantage
+ */
+
 #define SCE_O_RDONLY    0x01
 
 #define SEEK_SET    0
@@ -14,45 +18,24 @@ typedef uint32_t    SceUID;
 typedef uint32_t    SceMode;
 typedef int64_t     SceOff;
 
-typedef int     (*pfnSceIoRead)(SceUID fd, void* buffer, size_t size);
-typedef void    (*pfnSceIoClose)(SceUID fd);
-typedef SceUID  (*pfnSceIoOpen)(const char* path, int flags, SceMode mode);
-typedef SceOff  (*pfnSceIoLseek)(SceUID fd, SceOff off, int whence);
-typedef void    (*pfnSceKernelDcacheWritebackRange)(void* base, size_t size);
-
-static const pfnSceIoRead   sceIoRead   = (void*)0x08a4af3c;
-static const pfnSceIoClose  sceIoClose  = (void*)0x08a4af4c;
-static const pfnSceIoOpen   sceIoOpen   = (void*)0x08a4af6c;
-static const pfnSceIoLseek  sceIoLseek  = (void*)0x08a4af74;
-static const pfnSceKernelDcacheWritebackRange sceKernelDcacheWritebackRange = (void*)0x08a4b134;
-
-typedef void* (*pfn_malloc_r)(const void* reent, size_t size);
-typedef void  (*pfn_free_r)(const void* reent, void* ptr);
-
-static const pfn_malloc_r   _malloc_r = (void*)(0x0880bd40);
-static const pfn_free_r     _free_r =   (void*)(0x0880ad24);
-
-static const void* sReent = (void*)0x08a71f38;
-
-#define malloc(sz)  (_malloc_r(sReent, sz))
-#define free(ptr)   (_free_r(sReent, ptr))
-
-typedef char* (PFNSTRCATPROC)(char*, const char*);
-typedef int (PFNSTRCMPPROC)(const char*, const char*);
-typedef char* (PFNSTRCPYPROC)(char*, const char*);
-typedef size_t (PFNSTRLENPROC)(const char*);
-
-static const PFNSTRCATPROC* strcat = (const PFNSTRCATPROC*)0x0880f740;
-static const PFNSTRCMPPROC* strcmp = (const PFNSTRCMPPROC*)0x0880f800;
-static const PFNSTRCPYPROC* strcpy = (const PFNSTRCPYPROC*)0x0880f880;
-static const PFNSTRLENPROC* strlen = (const PFNSTRLENPROC*)0x0880f940;
-
-typedef void* (PFNMEMCHRPROC)(const void*, int, size_t);
-static const PFNMEMCHRPROC* memchr = (const PFNMEMCHRPROC*)0x0880c540;
-
 void*   memset(void*, int, size_t);
 void*   memmove(void*, const void*, size_t);
 int     memcmp(const void*, const void*, size_t);
 void*   memcpy(void* dst, const void* src, size_t len);
+void*   memchr(const void*, int, size_t);
+
+char*   strcat(char*, const char*);
+int     strcmp(const char*, const char*);
+char*   strcpy(char*, const char*);
+size_t  strlen(const char*);
+
+void*   malloc(size_t);
+void    free(void*);
+
+int     sceIoRead(SceUID fd, void* buffer, size_t size);
+void    sceIoClose(SceUID fd);
+SceUID  sceIoOpen(const char* path, int flags, SceMode mode);
+SceOff  sceIoLseek(SceUID fd, SceOff off, int whence);
+void    sceKernelDcacheWritebackRange(void* base, size_t size);
 
 #endif

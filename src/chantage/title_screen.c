@@ -1,4 +1,4 @@
-#include <chantage/chantage.h>
+#include <chantage/impl.h>
 
 static uint8_t gTitleText[] = {
 #include "title_text.inc"

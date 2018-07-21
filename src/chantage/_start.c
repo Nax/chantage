@@ -7,6 +7,7 @@ void HookTitleScreen();
 void _start()
 {
     InitFunctionRegistry();
+    HookFunctions();
     HookTitleScreen();
     LoadMods();
 }
