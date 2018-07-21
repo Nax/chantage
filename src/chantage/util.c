@@ -1,6 +1,6 @@
 #include <chantage/chantage.h>
 
-void ReplaceFunction(void* existingFunction, void* newFunction)
+void ReplaceFunction(void* existingFunction, const void* newFunction)
 {
     uint32_t* dst;
     uint32_t src;
