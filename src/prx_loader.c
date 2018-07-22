@@ -11,13 +11,13 @@ void* prxLoad(SceUID fd)
     Elf32_Phdr phdr;
     Elf32_Shdr shdr;
     Elf32_Rel rel;
-    Elf32_Off off;
     char* relOff;
     uint32_t relVal;
     char* hiPtr;
     uint16_t hiVal;
     int hiSolved;
 
+    hiVal = 0;
     segCount = 0;
     sceIoRead(fd, &ehdr, sizeof(ehdr));
 

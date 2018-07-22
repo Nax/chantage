@@ -53,14 +53,7 @@ uint32_t SetupTitleScreen(uint32_t unkArg)
     uint32_t* tmpPtr;
     uint32_t tmp;
     uint32_t tmp2;
-    uint32_t tmp3;
     uint16_t unk1;
-    uint16_t unk2;
-    uint16_t unk3;
-    uint16_t unk4;
-
-    uint32_t x;
-    uint32_t y;
 
     DrawTitleText();
 
@@ -69,15 +62,6 @@ uint32_t SetupTitleScreen(uint32_t unkArg)
     CreateDrawContext(0u);
 
     unk1 = 0;
-    unk2 = 0;
-    unk3 = 0x140;
-    unk4 = 0xF0;
-
-    if ((*(uint32_t*)0x09384408) != 0)
-    {
-        unk2 = 0xF0;
-    }
-
     _Unk08833d40(&unk1, *(uint32_t*)0x092f7b84);
     _Unk08833a80(0u);
 
@@ -94,9 +78,6 @@ uint32_t SetupTitleScreen(uint32_t unkArg)
     desc->counter = 0x00;
     desc->x = 0x00;
     desc->y = 0xFA;
-
-    x = 0xB9;
-    y = 0xBA;
 
     for (uint32_t i = 0; i < 4; ++i)
     {

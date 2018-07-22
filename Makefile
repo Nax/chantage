@@ -5,7 +5,7 @@ LD						:= $(TARGET)-ld
 PSP_PRXGEN				:= psp-prxgen
 
 BUILD_DIR				:= build
-CFLAGS					:= -EL -mabi=eabi -march=mips2 -Iinclude -Isrc -ffreestanding -nostdlib -Os -MMD -pipe
+CFLAGS					:= -EL -mabi=eabi -march=mips2 -Wall -Iinclude -Isrc -ffreestanding -nostdlib -Os -MMD -pipe
 LDFLAGS 				:= -L$(BUILD_DIR)/lib
 ARFLAGS					:= rcs
 
