@@ -19,10 +19,10 @@ typedef struct {
     u8      gfx;
     u8      level;
     u8      flags;
-    u8      attrID;
+    u8      unk0;
     u8      type;
     u8      unk1;
-    u8      sia;
+    u8      attrID;
     u16     price;
     u8      shop;
     u8      unk2;
@@ -32,7 +32,7 @@ typedef struct {
  * items.c
  */
 typedef ItemData*   (PFNGETITEMDATAPROC)(u16);
-typedef int         (PFNISITEMINVALIDPROC)(u16);
+typedef int         (PFNISITEMVALIDPROC)(u16);
 typedef size_t      (PFNITEMCOUNTPROC)();
 typedef u16         (PFNCREATEITEMPROC)();
 

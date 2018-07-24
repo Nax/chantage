@@ -8,7 +8,7 @@ void HookFunctions()
     REGISTER(RegisterFunction);
 
     REGISTER(GetItemData);
-    REGISTER(IsItemInvalid);
+    REGISTER(IsItemValid);
     REGISTER(ItemCount);
     REGISTER(CreateItem);
 }

@@ -9,6 +9,39 @@ static struct {
     ItemData*   extraItem;
 } gItemRegistry;
 
+static const u32 gPatchList[] = {
+    0x08878d5c,
+    0x08883700,
+    0x08970cb4,
+    0x08974404,
+    0x0898b7e8,
+    0x0898c67c,
+    0x0898d508,
+    0x0898ea34,
+    0x08990808,
+    0x08990dbc,
+    0x089a0618,
+    0x089a1808,
+    0x089a2878,
+    0x08a18c10,
+    0x08a18e54,
+    0x08a18f54,
+    0x08a190d0,
+    0x08a191b4,
+    0x08a192d0,
+    0x08a193b4,
+    0x08a194d0,
+    0x08a195b4,
+    0x08a196d0,
+    0x08a197b4,
+    0x08a198d0,
+    0x08a199b4,
+    0x08a34710,
+    0x08a34728,
+    0x08a34758,
+    0x08a34770
+};
+
 void InitItems(void)
 {
     gItemRegistry.extraItemSize = 0;
@@ -16,7 +49,7 @@ void InitItems(void)
     gItemRegistry.extraItem = malloc(sizeof(ItemData) * gItemRegistry.extraItemCapacity);
 
     ReplaceFunction((void*)0x08a18600, &GetItemData);
-    ReplaceFunction((void*)0x08a18dc0, &IsItemInvalid);
+    ReplaceFunction((void*)0x08a18dc0, &IsItemValid);
 }
 
 ItemData* GetItemData(u16 itemID)
@@ -40,13 +73,13 @@ ItemData* GetItemData(u16 itemID)
     return base + itemID;
 }
 
-int IsItemInvalid(u16 itemID)
+int IsItemValid(u16 itemID)
 {
     if (itemID == 0x00 || itemID == 0xfe || itemID == 0xff)
-        return 1;
+        return 0;
     if (itemID >= ItemCount())
-        return 1;
-    return 0;
+        return 0;
+    return 1;
 }
 
 size_t ItemCount(void)
@@ -70,7 +103,13 @@ u16 CreateItem(void)
         gItemRegistry.extraItem = newData;
         gItemRegistry.extraItemCapacity = newCapacity;
     }
+    memset(gItemRegistry.extraItem + gItemRegistry.extraItemSize, 0, sizeof(ItemData));
     itemID = NEW_ITEM_COUNT + gItemRegistry.extraItemSize;
     gItemRegistry.extraItemSize++;
+    for (size_t i = 0; i < (sizeof(gPatchList) / sizeof(*gPatchList)); ++i)
+    {
+        *((u16*)gPatchList[i]) = (u16)ItemCount();
+        sceKernelDcacheWritebackRange((void*)gPatchList[i], 2);
+    }
     return itemID;
 }

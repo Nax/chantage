@@ -15,6 +15,6 @@ void    ReplaceFunction(void* existingFunction, const void* newFunction);
 
 void        InitItems(void);
 ItemData*   GetItemData(u16 itemID);
-int         IsItemInvalid(u16 itemID);
+int         IsItemValid(u16 itemID);
 size_t      ItemCount(void);
 u16         CreateItem(void);
