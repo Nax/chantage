@@ -1,3 +1,7 @@
+DESTDIR 				?= build/dist
+DESTDIR_COMMON			:= $(DESTDIR)/PSP/COMMON/ULUS10297
+DESTDIR_MODS			:= $(DESTDIR_COMMON)/mods
+
 TARGET					:= mips-unknown-elf
 AR						:= $(TARGET)-ar
 CC						:= $(TARGET)-gcc
@@ -5,7 +9,7 @@ LD						:= $(TARGET)-ld
 PSP_PRXGEN				:= psp-prxgen
 
 BUILD_DIR				:= build
-CFLAGS					:= -EL -mabi=eabi -march=mips2 -Iinclude -Isrc -ffreestanding -nostdlib -Os -MMD -pipe
+CFLAGS					:= -EL -mabi=eabi -march=mips2 -Wall -Iinclude -Isrc -ffreestanding -nostdlib -Os -MMD -pipe
 LDFLAGS 				:= -L$(BUILD_DIR)/lib
 ARFLAGS					:= rcs
 
@@ -32,29 +36,39 @@ SLOWDOWN_ELF			:= $(BUILD_DIR)/mods/slowdown_fix.elf
 SLOWDOWN_OBJECTS		:= $(BUILD_DIR)/src/slowdown.c.o
 SLOWDOWN_LDFLAGS		:= $(CHANTAGE_LDFLAGS)
 
-DIST_DIR				:= dist
-DIST					:= $(DIST_DIR)/chantage.zip
-DIST_TMP				:= $(DIST_DIR)/tmp
-DIST_PSPDIR				:= $(DIST_TMP)/PSP/COMMON/ULUS10297
-DIST_MODSDIR			:= $(DIST_PSPDIR)/mods
+TESTMOD					:= $(BUILD_DIR)/mods/test_mod.prx
+TESTMOD_ELF				:= $(BUILD_DIR)/mods/test_mod.elf
+TESTMOD_OBJECTS			:= $(BUILD_DIR)/src/test_mod.c.o
+TESTMOD_LDFLAGS			:= $(CHANTAGE_LDFLAGS)
+
+DIST					:= $(BUILD_DIR)/chantage.zip
+
+ALL_TARGETS				:= $(LOADER) $(CHANTAGE) $(SLOWDOWN) $(TESTMOD)
 
 .PHONY: all
-all: $(LOADER) $(CHANTAGE) $(SLOWDOWN)
+all: $(ALL_TARGETS)
 
 -include $(DEPS)
+
+.PHONY: install
+install: $(ALL_TARGETS)
+	@mkdir -p $(DESTDIR_MODS)
+	cp chantage.ppf $(DESTDIR)
+	cp $(CHANTAGE) $(LOADER) $(DESTDIR_COMMON)
+	cp $(SLOWDOWN) $(TESTMOD) $(DESTDIR_MODS)
+	ls -1 $(DESTDIR_MODS) > $(DESTDIR_COMMON)/mods.txt
 
 .PHONY: dist
 dist: $(DIST)
 
-$(DIST): $(LOADER) $(CHANTAGE) $(SLOWDOWN)
-	@mkdir -p $(DIST_MODSDIR)
-	rm -rf $(DIST)
-	cp chantage.ppf $(DIST_TMP)
-	cp $(CHANTAGE) $(LOADER) $(DIST_PSPDIR)
-	cp $(SLOWDOWN) $(DIST_MODSDIR)
-	ls -1 $(DIST_MODSDIR) > $(DIST_PSPDIR)/mods.txt
-	cd $(DIST_TMP) && zip -r ../chantage.zip PSP chantage.ppf
-	rm -rf $(DIST_TMP)
+$(DIST): $(ALL_TARGETS)
+	@mkdir -p $(dir $@)
+	TMP=$$(mktemp -d)						\
+	&& $(MAKE) install DESTDIR=$$TMP		\
+	&& cd $$TMP 							\
+	&& zip -r $(abspath $(DIST)) ./ 		\
+	&& cd ..								\
+	&& rm -rf $$TMP
 
 .PHONY: clean
 clean:
@@ -90,6 +104,14 @@ $(SLOWDOWN): $(SLOWDOWN_ELF)
 $(SLOWDOWN_ELF): $(SLOWDOWN_OBJECTS) $(LIBCHANTAGE)
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $(SLOWDOWN_LDFLAGS) $(SLOWDOWN_OBJECTS) -lchantage -lgcc -o $@
+
+$(TESTMOD): $(TESTMOD_ELF)
+	@mkdir -p $(dir $@)
+	$(PSP_PRXGEN) $< $@
+
+$(TESTMOD_ELF): $(TESTMOD_OBJECTS) $(LIBCHANTAGE)
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) $(TESTMOD_LDFLAGS) $(TESTMOD_OBJECTS) -lchantage -lgcc -o $@
 
 $(LIBCHANTAGE): $(LIBCHANTAGE_OBJECTS)
 	@mkdir -p $(dir $@)
