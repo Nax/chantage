@@ -1,12 +1,9 @@
 #include <chantage/impl.h>
 
-#define OLD_ITEM_COUNT  0x100
-#define NEW_ITEM_COUNT  0x13c
-
 static struct {
-    size_t      extraItemSize;
-    size_t      extraItemCapacity;
-    ItemData*   extraItem;
+    size_t      itemSize;
+    size_t      itemCapacity;
+    ItemData*   items;
 } gItemRegistry;
 
 static const u32 gPatchList[] = {
@@ -44,9 +41,57 @@ static const u32 gPatchList[] = {
 
 void InitItems(void)
 {
-    gItemRegistry.extraItemSize = 0;
-    gItemRegistry.extraItemCapacity = 8;
-    gItemRegistry.extraItem = malloc(sizeof(ItemData) * gItemRegistry.extraItemCapacity);
+    /* Init the registry */
+    gItemRegistry.itemSize = 0x13c;
+    gItemRegistry.itemCapacity = 0x13c;
+    gItemRegistry.items = malloc(sizeof(ItemData) * gItemRegistry.itemCapacity);
+    memset(gItemRegistry.items, 0, sizeof(ItemData) * gItemRegistry.itemCapacity);
+
+    /* Copy basic item data */
+    for (size_t i = 0; i < 0x100; ++i)
+        memcpy(&gItemRegistry.items[i].basic, ((ItemBasicData*)0x08b29288) + i, sizeof(ItemBasicData));
+    for (size_t i = 0; i < 0x3c; ++i)
+        memcpy(&gItemRegistry.items[0x100 + i].basic, ((ItemBasicData*)0x08a5adac) + i, sizeof(ItemBasicData));
+    
+    /* Copy weapon data */
+    for (size_t i = 0; i < 0x80; ++i)
+        memcpy(&gItemRegistry.items[i].weapon, ((ItemWeaponData*)0x08b29e88) + i, sizeof(ItemWeaponData));
+    for (size_t i = 0; i < 0x16; ++i)
+        memcpy(&gItemRegistry.items[0x100 + i].weapon, ((ItemWeaponData*)0x08a5b07c) + i, sizeof(ItemWeaponData));
+
+    /* Copy shield data */
+    for (size_t i = 0; i < 0x10; ++i)
+        memcpy(&gItemRegistry.items[0x80 + i].block, ((ItemBlockData*)0x08b2a288) + i, sizeof(ItemBlockData));
+    for (size_t i = 0; i < 0x2; ++i)
+        memcpy(&gItemRegistry.items[0x120 + i].block, ((ItemBlockData*)0x08a5b17c) + i, sizeof(ItemBlockData));
+
+    /* Copy armor data */
+    for (size_t i = 0; i < 0x40; ++i)
+        memcpy(&gItemRegistry.items[0x90 + i].armor, ((ItemArmorData*)0x08b2a2a8) + i, sizeof(ItemArmorData));
+    for (size_t i = 0; i < 0xe; ++i)
+        memcpy(&gItemRegistry.items[0x124 + i].armor, ((ItemArmorData*)0x08a5b184) + i, sizeof(ItemArmorData));
+
+    /* Copy accessory data */
+    for (size_t i = 0; i < 0x20; ++i)
+        memcpy(&gItemRegistry.items[0xd0 + i].accessory, ((ItemBlockData*)0x08b2a328) + i, sizeof(ItemBlockData));
+
+    /* Copy chemist data */
+    for (size_t i = 0; i < 0xe; ++i)
+        memcpy(&gItemRegistry.items[0xf0 + i].chemist, ((ItemChemistData*)0x08b2a368) + i, sizeof(ItemChemistData));
+
+    /* Copy item attributes */
+    for (size_t i = 0; i < 0x13c; ++i)
+    {
+        ItemAttributes* attr;
+        ItemData* item = gItemRegistry.items + i;
+        u16 attrID = item->basic.attrID;
+
+        if (attrID >= 0x50)
+            attr = ((ItemAttributes*)0x08a5b1b8) + (i - 0x50);
+        else
+            attr = ((ItemAttributes*)0x08b2a694) + i;
+        memcpy(&item->attributes, attr, sizeof(ItemAttributes));
+    }
 
     ReplaceFunction((void*)0x08a18600, &GetItemData);
     ReplaceFunction((void*)0x08a18dc0, &IsItemValid);
@@ -54,23 +99,7 @@ void InitItems(void)
 
 ItemData* GetItemData(u16 itemID)
 {
-    ItemData* base;
-
-    if (itemID < OLD_ITEM_COUNT)
-    {
-        base = (ItemData*)0x08b29288;
-    }
-    else if (itemID < NEW_ITEM_COUNT)
-    {
-        base = (ItemData*)0x08a5adac;
-        itemID -= OLD_ITEM_COUNT;
-    }
-    else
-    {
-        base = gItemRegistry.extraItem;
-        itemID -= NEW_ITEM_COUNT;
-    }
-    return base + itemID;
+    return gItemRegistry.items + itemID;
 }
 
 int IsItemValid(u16 itemID)
@@ -84,7 +113,7 @@ int IsItemValid(u16 itemID)
 
 size_t ItemCount(void)
 {
-    return 0x13C + gItemRegistry.extraItemSize;
+    return gItemRegistry.itemSize;
 }
 
 u16 CreateItem(void)
@@ -93,19 +122,19 @@ u16 CreateItem(void)
     ItemData* newData;
     u16 itemID;
 
-    if (gItemRegistry.extraItemSize == gItemRegistry.extraItemCapacity)
+    if (gItemRegistry.itemSize == gItemRegistry.itemCapacity)
     {
-        newCapacity = gItemRegistry.extraItemCapacity;
+        newCapacity = gItemRegistry.itemCapacity;
         newCapacity += newCapacity / 2;
         newData = malloc(newCapacity * sizeof(ItemData));
-        memcpy(newData, gItemRegistry.extraItem, gItemRegistry.extraItemSize * sizeof(ItemData));
-        free(gItemRegistry.extraItem);
-        gItemRegistry.extraItem = newData;
-        gItemRegistry.extraItemCapacity = newCapacity;
+        memcpy(newData, gItemRegistry.items, gItemRegistry.itemSize * sizeof(ItemData));
+        memset(newData + gItemRegistry.itemSize, 0, newCapacity - gItemRegistry.itemCapacity);
+        free(gItemRegistry.items);
+        gItemRegistry.items = newData;
+        gItemRegistry.itemCapacity = newCapacity;
     }
-    memset(gItemRegistry.extraItem + gItemRegistry.extraItemSize, 0, sizeof(ItemData));
-    itemID = NEW_ITEM_COUNT + gItemRegistry.extraItemSize;
-    gItemRegistry.extraItemSize++;
+    itemID = gItemRegistry.itemSize;
+    gItemRegistry.itemSize++;
     for (size_t i = 0; i < (sizeof(gPatchList) / sizeof(*gPatchList)); ++i)
     {
         *((u16*)gPatchList[i]) = (u16)ItemCount();
