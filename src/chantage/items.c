@@ -52,7 +52,7 @@ void InitItems(void)
         memcpy(&gItemRegistry.items[i].basic, ((ItemBasicData*)0x08b29288) + i, sizeof(ItemBasicData));
     for (size_t i = 0; i < 0x3c; ++i)
         memcpy(&gItemRegistry.items[0x100 + i].basic, ((ItemBasicData*)0x08a5adac) + i, sizeof(ItemBasicData));
-    
+
     /* Copy weapon data */
     for (size_t i = 0; i < 0x80; ++i)
         memcpy(&gItemRegistry.items[i].weapon, ((ItemWeaponData*)0x08b29e88) + i, sizeof(ItemWeaponData));
@@ -94,12 +94,67 @@ void InitItems(void)
     }
 
     ReplaceFunction((void*)0x08a18600, &GetItemData);
+    ReplaceFunction((void*)0x08a18680, &GetItemWeaponData);
+    ReplaceFunction((void*)0x08a186c0, &GetItemShieldData);
+    ReplaceFunction((void*)0x08a18700, &GetItemArmorData);
+    ReplaceFunction((void*)0x08a18740, &GetItemAccessoryData);
+    ReplaceFunction((void*)0x08a18780, &GetItemChemistData);
     ReplaceFunction((void*)0x08a18dc0, &IsItemValid);
 }
 
 ItemData* GetItemData(u16 itemID)
 {
     return gItemRegistry.items + itemID;
+}
+
+ItemWeaponData* GetItemWeaponData(u16 itemID)
+{
+    if (itemID >= gItemRegistry.itemSize)
+        return NULL;
+    ItemData* item = &gItemRegistry.items[itemID];
+    if (item->basic.flags & 0x80)
+        return &item->weapon;
+    return NULL;
+}
+
+ItemBlockData* GetItemShieldData(u16 itemID)
+{
+    if (itemID >= gItemRegistry.itemSize)
+        return NULL;
+    ItemData* item = &gItemRegistry.items[itemID];
+    if (item->basic.flags & 0x40)
+        return &item->block;
+    return NULL;
+}
+
+ItemArmorData* GetItemArmorData(u16 itemID)
+{
+    if (itemID >= gItemRegistry.itemSize)
+        return NULL;
+    ItemData* item = &gItemRegistry.items[itemID];
+    if (item->basic.flags & 0x30)
+        return &item->armor;
+    return NULL;
+}
+
+ItemBlockData* GetItemAccessoryData(u16 itemID)
+{
+    if (itemID >= gItemRegistry.itemSize)
+        return NULL;
+    ItemData* item = &gItemRegistry.items[itemID];
+    if (item->basic.flags & 0x08)
+        return &item->accessory;
+    return NULL;
+}
+
+ItemChemistData* GetItemChemistData(u16 itemID)
+{
+    if (itemID >= gItemRegistry.itemSize)
+        return NULL;
+    ItemData* item = &gItemRegistry.items[itemID];
+    if (!(item->basic.flags & 0xf8))
+        return &item->chemist;
+    return NULL;
 }
 
 int IsItemValid(u16 itemID)

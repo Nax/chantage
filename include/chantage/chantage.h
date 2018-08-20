@@ -80,10 +80,16 @@ typedef struct {
 /*
  * items.c
  */
-typedef ItemData*  (PFNGETITEMDATAPROC)(u16);
-typedef int        (PFNISITEMVALIDPROC)(u16);
-typedef size_t     (PFNITEMCOUNTPROC)();
-typedef u16        (PFNCREATEITEMPROC)();
+typedef ItemData*           (PFNGETITEMDATAPROC)(u16);
+typedef ItemWeaponData*     (PFNGETITEMWEAPONDATAPROC)(u16);
+typedef ItemBlockData*      (PFNGETITEMSHIELDDATAPROC)(u16);
+typedef ItemArmorData*      (PFNGETITEMARMORDATAPROC)(u16);
+typedef ItemBlockData*      (PFNGETITEMACCESSORYDATAPROC)(u16);
+typedef ItemChemistData*    (PFNGETITEMCHEMISTDATAPROC)(u16);
+
+typedef int             (PFNISITEMVALIDPROC)(u16);
+typedef size_t          (PFNITEMCOUNTPROC)();
+typedef u16             (PFNCREATEITEMPROC)();
 
 typedef void* (PFNLOADFUNCTIONPROC)(const char*);
 typedef void* (PFNREGISTERFUNCTIONPROC)(const char*, void*);

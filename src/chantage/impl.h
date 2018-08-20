@@ -13,8 +13,13 @@ void    ReplaceFunction(void* existingFunction, const void* newFunction);
  * items.c
  */
 
-void        InitItems(void);
-ItemData*   GetItemData(u16 itemID);
-int         IsItemValid(u16 itemID);
-size_t      ItemCount(void);
-u16         CreateItem(void);
+void                InitItems(void);
+ItemData*           GetItemData(u16 itemID);
+ItemWeaponData*     GetItemWeaponData(u16 itemID);
+ItemBlockData*      GetItemShieldData(u16 itemID);
+ItemArmorData*      GetItemArmorData(u16 itemID);
+ItemBlockData*      GetItemAccessoryData(u16 itemID);
+ItemChemistData*    GetItemChemistData(u16 itemID);
+int                 IsItemValid(u16 itemID);
+size_t              ItemCount(void);
+u16                 CreateItem(void);
