@@ -423,4 +423,37 @@ typedef struct{
     ExtendedBattleData* extendedBattleData;
 } PACKED NewBattleData
 
+typedef struct{
+    u16 JPCost;
+    u8 learnChance;
+    u8 abilityTypeMask;
+    u8 abilityAIFlags1;
+    u8 abilityAIFlags2;
+    u8 abilityAIFlags3;
+    u8 abilityAIFlags4;
+} PACKED AbilityAIData
+
+typedef struct{
+    u8 range;
+    u8 effectArea;
+    u8 vertical;
+    u8 abilityFlagsMask1;
+    u8 abilityFlagsMask2;
+    u8 abilityFlagsMask3;
+    u8 abilityFlagsMask4;
+    u8 element;
+    u8 formula;
+    u8 xConstant;
+    u8 yConstant;
+    u8 inflictStatus;
+    u8 CT;
+    u8 MPCost;
+
+} PACKED AbilityData
+
+typedef struct{
+    u8 newStatusMask;
+    u8 newRequirementsMask;
+} PACKED ExtraAbilityData
+
 #endif

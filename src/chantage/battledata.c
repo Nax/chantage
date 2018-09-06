@@ -32,3 +32,8 @@ NewBattleData buildMergedData(unit_offset){
 
     return NewBattleData
 }
+
+NewBattleData* getMergedData(unit_offset){
+    base = BattleDataRegistry.battleDataArray;
+    return base + unit_offset
+}
