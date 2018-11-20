@@ -9,12 +9,16 @@ SECTIONS
         * ( .text.* )
     }
 
+    .rodata.sceModuleInfo : SUBALIGN(0x4) {
+        * ( .rodata.sceModuleInfo )
+    }
+
     .data : SUBALIGN(0x04) {
         * ( .data )
         * ( .data.* )
         * ( .rodata )
         * ( .rodata.* )
-        * (COMMON)
+        * ( COMMON )
         * ( .bss )
     }
 

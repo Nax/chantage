@@ -19,4 +19,5 @@ void _start(PFNLOADFUNCTIONPROC* LoadFunction)
     item = GetItemData(itemID);
     memcpy(item, excalibur, sizeof(ItemData));
     item->basic.palette = 0x14;
+    item->weapon.unk[0x04] = 99;
 }

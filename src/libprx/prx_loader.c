@@ -60,43 +60,43 @@ void* prxLoad(SceUID fd)
             relVal = (uint32_t)segments[ELF32_R_ADDR_BASE(rel.r_info)];
             switch (ELF32_R_TYPE(rel.r_info))
             {
-                case R_MIPS_NONE:
-                    break;
-                case R_MIPS_16:
-                    relVal += *(uint16_t*)relOff;
-                    *(uint16_t*)relOff = (uint16_t)relVal;
-                    break;
-                case R_MIPS_32:
-                    relVal += *(uint32_t*)relOff;
-                    *(uint32_t*)relOff = (uint32_t)relVal;
-                    break;
-                case R_MIPS_REL32:
-                    relVal += *(uint32_t*)relOff;
-                    *(uint32_t*)relOff = (uint32_t)relVal - (uint32_t)relOff;
-                    break;
-                case R_MIPS_26:
-                    relVal += (*((uint32_t*)relOff) & 0x3ffffff) << 2;
-                    *((uint32_t*)relOff) = (*((uint32_t*)relOff) & 0xfc000000) | ((relVal >> 2) & 0x3ffffff);
-                    break;
-                case R_MIPS_HI16:
-                    hiPtr = relOff;
-                    hiVal = *(uint16_t*)hiPtr;
-                    hiSolved = 0;
-                    break;
-                case R_MIPS_LO16:
-                    relVal += (hiVal << 16) | (*(uint16_t*)relOff);
-                    if (!hiSolved)
+            case R_MIPS_NONE:
+                break;
+            case R_MIPS_16:
+                relVal += *(uint16_t*)relOff;
+                *(uint16_t*)relOff = (uint16_t)relVal;
+                break;
+            case R_MIPS_32:
+                relVal += *(uint32_t*)relOff;
+                *(uint32_t*)relOff = (uint32_t)relVal;
+                break;
+            case R_MIPS_REL32:
+                relVal += *(uint32_t*)relOff;
+                *(uint32_t*)relOff = (uint32_t)relVal - (uint32_t)relOff;
+                break;
+            case R_MIPS_26:
+                relVal += (*((uint32_t*)relOff) & 0x3ffffff) << 2;
+                *((uint32_t*)relOff) = (*((uint32_t*)relOff) & 0xfc000000) | ((relVal >> 2) & 0x3ffffff);
+                break;
+            case R_MIPS_HI16:
+                hiPtr = relOff;
+                hiVal = *(uint16_t*)hiPtr;
+                hiSolved = 0;
+                break;
+            case R_MIPS_LO16:
+                relVal += (hiVal << 16) | (*(uint16_t*)relOff);
+                if (!hiSolved)
+                {
+                    /* LO16 is signed, so we may need to adjust the HI16 accordingly */
+                    if (relVal & 0x8000)
                     {
-                        /* LO16 is signed, so we may need to adjust the HI16 accordingly */
-                        if (relVal & 0x8000)
-                        {
-                            relVal += 0x10000;
-                        }
-                        *((uint16_t*)hiPtr) = (relVal >> 16);
-                        hiSolved = 1;
+                        relVal += 0x10000;
                     }
-                    *((uint16_t*)relOff) = (relVal & 0xffff);
-                    break;
+                    *((uint16_t*)hiPtr) = (relVal >> 16);
+                    hiSolved = 1;
+                }
+                *((uint16_t*)relOff) = (relVal & 0xffff);
+                break;
             }
         }
     }

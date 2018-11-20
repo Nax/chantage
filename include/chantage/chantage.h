@@ -4,7 +4,15 @@
 #include <chantage/psp.h>
 #include <chantage/psp_module_info.h>
 
-#define PACKED  __attribute__ ((packed))
+/*
+ * GCC is the only supported compiler,
+ * this is mostly to fix static analysis.
+ */
+#if defined(__GNUC__)
+# define PACKED  __attribute__ ((packed))
+#else
+# define PACKED
+#endif
 
 typedef int8_t      i8;
 typedef int16_t     i16;
