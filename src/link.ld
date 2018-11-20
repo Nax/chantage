@@ -4,9 +4,16 @@ SECTIONS
     . = 0x0;
 
     .text : SUBALIGN(0x4) {
+        * ( .text.start )
         * ( .text )
+        * ( .text.* )
+    }
+
+    .data : SUBALIGN(0x04) {
         * ( .data )
+        * ( .data.* )
         * ( .rodata )
+        * ( .rodata.* )
         * (COMMON)
         * ( .bss )
     }

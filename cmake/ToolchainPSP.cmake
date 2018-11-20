@@ -1,0 +1,10 @@
+set(CMAKE_SYSTEM_NAME Generic)
+set(CMAKE_C_COMPILER "mips-unknown-elf-gcc")
+set(_psp_flags "-EL -mabi=eabi -march=mips2 -ffreestanding -nostdlib")
+set(CMAKE_C_FLAGS "${_psp_flags}")
+set(CMAKE_CXX_FLAGS "${_psp_flags}")
+set(CMAKE_ASM_FLAGS "${_psp_flags}")
+
+set(CMAKE_C_FLAGS_RELEASE "-Os")
+set(CMAKE_CXX_FLAGS_RELEASE "-Os")
+set(CMAKE_ASM_FLAGS_RELEASE "-Os")

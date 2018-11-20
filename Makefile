@@ -16,14 +16,14 @@ ARFLAGS					:= rcs
 DEPS					:= $(shell find $(BUILD_DIR) -name '*.d' 2>/dev/null)
 
 LIBCHANTAGE				:= $(BUILD_DIR)/lib/libchantage.a
-LIBCHANTAGE_OBJECTS		:= $(BUILD_DIR)/src/libchantage.S.o
+LIBCHANTAGE_OBJECTS		:= $(BUILD_DIR)/src/libchantage/libchantage.S.o
 
-LIBPRXLOADER			:= $(BUILD_DIR)/lib/libprxloader.a
-LIBPRXLOADER_OBJECTS	:= $(BUILD_DIR)/src/prx_loader.c.o
+LIBPRXLOADER			:= $(BUILD_DIR)/lib/libprx.a
+LIBPRXLOADER_OBJECTS	:= $(BUILD_DIR)/src/libprx/prx_loader.c.o
 
 LOADER					:= $(BUILD_DIR)/chantage_loader.bin
-LOADER_OBJECTS			:= $(BUILD_DIR)/src/chantage_loader.c.o
-LOADER_LDFLAGS			:= $(LDFLAGS) -T src/flat_binary.ld
+LOADER_OBJECTS			:= $(BUILD_DIR)/src/chantage_loader/chantage_loader.c.o
+LOADER_LDFLAGS			:= $(LDFLAGS) -T src/binary.ld
 
 CHANTAGE				:= $(BUILD_DIR)/chantage.prx
 CHANTAGE_ELF			:= $(BUILD_DIR)/chantage.elf
@@ -87,7 +87,7 @@ $(LIBPRXLOADER): $(LIBPRXLOADER_OBJECTS)
 
 $(LOADER): $(LOADER_OBJECTS) $(LIBPRXLOADER) $(LIBCHANTAGE)
 	@mkdir -p $(dir $@)
-	$(LD) $(LOADER_LDFLAGS) $(LOADER_OBJECTS) -L$(BUILD_DIR)/lib -lprxloader -lchantage -o $@
+	$(CC) -EL $(LOADER_LDFLAGS) $(LOADER_OBJECTS) -L$(BUILD_DIR)/lib -lprxloader -lchantage -o $@
 
 $(CHANTAGE): $(CHANTAGE_ELF)
 	@mkdir -p $(dir $@)
