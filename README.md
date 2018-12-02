@@ -28,7 +28,7 @@ To install for development (Windows, PPSSPP with installed.txt):
 
 To install for development (Windows, PPSSPP without installed.txt):
 
-    make install DESTDIR="C:\Program Files\ppsspp\memstick"
+    make install DESTDIR="C:/Program Files/ppsspp/memstick"
 
 To package before release:
 
