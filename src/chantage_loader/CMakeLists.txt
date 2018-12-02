@@ -16,7 +16,7 @@ add_custom_command(
     DEPENDS
     chantage_loader_elf
     COMMAND
-    "mips-unknown-elf-objcopy"
+    "${CHANTAGE_PREFIX}objcopy"
     "-S"
     "-O"
     "binary"

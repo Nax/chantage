@@ -31,3 +31,5 @@ add_custom_target(chantage ALL
     "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
     VERBATIM
 )
+
+install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")

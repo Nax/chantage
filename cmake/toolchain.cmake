@@ -1,9 +1,11 @@
 set(CMAKE_SYSTEM_NAME Generic)
-set(CMAKE_C_COMPILER "mips-unknown-elf-gcc")
-set(_psp_flags "-EL -mabi=eabi -march=mips2 -ffreestanding -nostdlib")
-set(CMAKE_C_FLAGS "${_psp_flags}")
-set(CMAKE_CXX_FLAGS "${_psp_flags}")
-set(CMAKE_ASM_FLAGS "${_psp_flags}")
+set(CHANTAGE_PREFIX "chantage-")
+set(CMAKE_C_COMPILER "${CHANTAGE_PREFIX}gcc")
+set(CMAKE_CXX_COMPILER "${CHANTAGE_PREFIX}g++")
+set(CHANTAGE_FLAGS "-EL -mabi=eabi -march=mips2 -ffreestanding -nostdlib")
+set(CMAKE_C_FLAGS "${CHANTAGE_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CHANTAGE_FLAGS}")
+set(CMAKE_ASM_FLAGS "${CHANTAGE_FLAGS}")
 
 set(CMAKE_C_FLAGS_RELEASE "-Os")
 set(CMAKE_CXX_FLAGS_RELEASE "-Os")
@@ -25,7 +27,7 @@ macro(add_mod _name)
         DEPENDS
         ${_name_elf}
         COMMAND
-        "psp-prxgen"
+        "${CHANTAGE_PREFIX}psp-prxgen"
         "$<TARGET_FILE:${_name_elf}>"
         "${_name}.prx"
         WORKING_DIRECTORY
