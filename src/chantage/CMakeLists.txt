@@ -16,11 +16,11 @@ add_custom_command(
     DEPENDS
     chantage_elf
     COMMAND
-    "psp-prxgen"
+    "${CHANTAGE_PREFIX}psp-prxgen"
     "$<TARGET_FILE:chantage_elf>"
     "chantage.prx"
     WORKING_DIRECTORY
-    "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+    "${CHANTAGE_BUILD_BIN}"
     VERBATIM
 )
 
@@ -28,8 +28,13 @@ add_custom_target(chantage ALL
     DEPENDS
     "chantage.prx"
     WORKING_DIRECTORY
-    "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+    "${CHANTAGE_BUILD_BIN}"
     VERBATIM
 )
 
-install(FILES "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+install(
+    FILES
+    "${CHANTAGE_BUILD_BIN}/chantage.prx"
+    DESTINATION
+    "${CHANTAGE_PSP_PREFIX}"
+)

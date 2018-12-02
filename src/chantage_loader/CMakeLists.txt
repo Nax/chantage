@@ -23,7 +23,7 @@ add_custom_command(
     "$<TARGET_FILE:chantage_loader_elf>"
     "chantage_loader.bin"
     WORKING_DIRECTORY
-    "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+    "${CHANTAGE_BUILD_BIN}"
     VERBATIM
 )
 
@@ -31,6 +31,15 @@ add_custom_target(chantage_loader ALL
     DEPENDS
     "chantage_loader.bin"
     WORKING_DIRECTORY
-    "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+    "${CHANTAGE_BUILD_BIN}"
     VERBATIM
 )
+
+install(
+    FILES
+    "${CHANTAGE_BUILD_BIN}/chantage_loader.bin"
+    DESTINATION
+    "${CHANTAGE_PSP_PREFIX}"
+)
+
+
