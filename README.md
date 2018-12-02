@@ -1,22 +1,36 @@
 # Chantage
 
-A Final Fantasy Tactics : The War of the Lions mod loader and API.
+A Final Fantasy Tactics: The War of the Lions mod loader and API.
+
+## Dependencies
+
+In order to build chantage, you need a copy of the chantage toolchain.
+It can be obtained here: https://dl.nax.io/
+
+On windows, simply copy the toolchain into `C:\`
+
+CMake is also required. On Windows, you probably want to use PowerShell and get GNU Make.
 
 ## Building
 
-In order to build chantage, you need:
+To build:
 
- * A working binutils + gcc cross compiler targeting the `mips-unknown-elf` triple.
- * The `psp-prxgen` tool.
+    git clone https://github.com/FFT-Hackers/chantage.git
+    cd chantage
+    mkdir build
+    cd build
+    cmake .. -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles"
+    make -j16
 
-The easiest way to build a working cross compiler is to use the [build-cc](https://github.com/Nax/build-cc) tool:
+To install for development (Windows, PPSSPP with installed.txt):
 
-    git clone https://github.com/Nax/build-cc.git
-    cd build-cc
-    sudo bin/build-cc mips-unknown-elf
+    make install DESTDIR="${env:UserProfile}/Documents/PPSSPP"
 
-This will install a working cross compiler at `/opt/cross` by default.
+To install for development (Windows, PPSSPP without installed.txt):
 
-You can get psp-prxgen here: https://github.com/pspdev/pspsdk  
-If you don't want to build the whole PSP SDK, it is possible to make a dummy, empty config.h and then to compile
-psp-prxgen directly from the `psp-prxgen.c` file.
+    make install DESTDIR="C:\Program Files\ppsspp\memstick"
+
+To package before release:
+
+    make install DESTDIR=dist
+
