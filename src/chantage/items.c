@@ -41,6 +41,9 @@ static const u32 gPatchList[] = {
 
 void InitItems(void)
 {
+    const char* strBase;
+    uint32_t    strLength;
+
     /* Init the registry */
     gItemRegistry.itemSize = 0x13c;
     gItemRegistry.itemCapacity = 0x13c;
@@ -52,6 +55,19 @@ void InitItems(void)
         memcpy(&gItemRegistry.items[i].basic, ((ItemBasicData*)0x08b29288) + i, sizeof(ItemBasicData));
     for (size_t i = 0; i < 0x3c; ++i)
         memcpy(&gItemRegistry.items[0x100 + i].basic, ((ItemBasicData*)0x08a5adac) + i, sizeof(ItemBasicData));
+
+    /* Copy names */
+    strBase = (const char*)(0x08a935fd);
+    for (size_t i = 0; i < 0x13c; ++i)
+    {
+        //strLength = GetTextLength(strBase) + 1;
+        //gItemRegistry.items[i].name = malloc(strLength);
+        //memcpy(gItemRegistry.items[i].name, strBase, strLength);
+        /*
+        strBase += strLength;
+        */
+        //gItemRegistry.items[i].name[0]++; // DEBUG
+    }
 
     /* Copy weapon data */
     for (size_t i = 0; i < 0x80; ++i)
@@ -100,6 +116,11 @@ void InitItems(void)
     ReplaceFunction((void*)0x08a18740, &GetItemAccessoryData);
     ReplaceFunction((void*)0x08a18780, &GetItemChemistData);
     ReplaceFunction((void*)0x08a18dc0, &IsItemValid);
+}
+
+const char* GetItemName(u16 itemID)
+{
+    return 0;//return gItemRegistry.items[itemID].name;
 }
 
 ItemData* GetItemData(u16 itemID)

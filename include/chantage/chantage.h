@@ -83,11 +83,13 @@ typedef struct {
     };
     ItemAttributes  attributes;
     u8              zero;
+    //char*           name;
 } PACKED ItemData;
 
 /*
  * items.c
  */
+typedef const char*         (PFNGETITEMNAMEPROC)(u16);
 typedef ItemData*           (PFNGETITEMDATAPROC)(u16);
 typedef ItemWeaponData*     (PFNGETITEMWEAPONDATAPROC)(u16);
 typedef ItemBlockData*      (PFNGETITEMSHIELDDATAPROC)(u16);

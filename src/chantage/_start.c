@@ -8,6 +8,7 @@ void _start()
 {
     InitFunctionRegistry();
     InitItems();
+    InitText();
     HookFunctions();
     HookTitleScreen();
     LoadMods();

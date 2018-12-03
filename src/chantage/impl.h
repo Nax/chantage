@@ -1,5 +1,7 @@
 #include <chantage/chantage.h>
 
+#define BREAKPOINT      __asm__ __volatile__ ("break\r\n");
+
 typedef void (Mod)(PFNLOADFUNCTIONPROC*);
 
 void    LoadMods();
@@ -14,6 +16,7 @@ void    ReplaceFunction(void* existingFunction, const void* newFunction);
  */
 
 void                InitItems(void);
+const char*         GetItemName(u16 itemID);
 ItemData*           GetItemData(u16 itemID);
 ItemWeaponData*     GetItemWeaponData(u16 itemID);
 ItemBlockData*      GetItemShieldData(u16 itemID);
@@ -23,3 +26,11 @@ ItemChemistData*    GetItemChemistData(u16 itemID);
 int                 IsItemValid(u16 itemID);
 size_t              ItemCount(void);
 u16                 CreateItem(void);
+
+/*
+ * text.c
+ */
+
+void        InitText(void);
+const char* GetTextCompat(const char* base, uint32_t id);
+uint32_t    GetTextLength(const char* str);

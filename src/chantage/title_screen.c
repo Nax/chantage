@@ -161,5 +161,5 @@ uint32_t SetupTitleScreen(uint32_t unkArg)
 
 void HookTitleScreen()
 {
-    ReplaceFunction((void*)0x088dda80, &SetupTitleScreen);
+    //ReplaceFunction((void*)0x088dda80, &SetupTitleScreen);
 }
