@@ -10,6 +10,6 @@ void _start()
     InitItems();
     InitText();
     HookFunctions();
-    HookTitleScreen();
-    LoadMods();
+    //HookTitleScreen();
+    //LoadMods();
 }

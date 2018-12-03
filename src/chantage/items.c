@@ -60,13 +60,11 @@ void InitItems(void)
     strBase = (const char*)(0x08a935fd);
     for (size_t i = 0; i < 0x13c; ++i)
     {
-        //strLength = GetTextLength(strBase) + 1;
-        //gItemRegistry.items[i].name = malloc(strLength);
-        //memcpy(gItemRegistry.items[i].name, strBase, strLength);
-        /*
+        strLength = GetTextLength(strBase) + 1;
+        gItemRegistry.items[i].name = malloc(strLength);
+        memcpy(gItemRegistry.items[i].name, strBase, strLength);
         strBase += strLength;
-        */
-        //gItemRegistry.items[i].name[0]++; // DEBUG
+        gItemRegistry.items[i].name[0]++; // DEBUG
     }
 
     /* Copy weapon data */
@@ -120,7 +118,12 @@ void InitItems(void)
 
 const char* GetItemName(u16 itemID)
 {
-    return 0;//return gItemRegistry.items[itemID].name;
+    return gItemRegistry.items[itemID].name;
+}
+
+const char* GetItemDescription(u16 itemID)
+{
+    return "\x0a\x0a\x0a\xfe";
 }
 
 ItemData* GetItemData(u16 itemID)
