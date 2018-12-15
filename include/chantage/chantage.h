@@ -84,6 +84,7 @@ typedef struct {
     ItemAttributes  attributes;
     u8              zero;
     char*           name;
+    char*           desc;
 } PACKED ItemData;
 
 /*

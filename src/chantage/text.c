@@ -6,7 +6,7 @@ void InitText(void)
     ReplaceFunction((void*)0x089bafec, &GetTextCompat);
 }
 
-static const char* _seekText(const char* base, uint32_t id)
+const char* GetText(const char* base, uint32_t id)
 {
     uint8_t c;
     for (;;)
@@ -32,7 +32,7 @@ const char* GetTextCompat(const char* base, uint32_t id)
     {
         return GetItemDescription(id);
     }
-    return _seekText(base, id);
+    return GetText(base, id);
 }
 
 uint32_t GetTextLength(const char* str)

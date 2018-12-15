@@ -33,5 +33,6 @@ u16                 CreateItem(void);
  */
 
 void        InitText(void);
+const char* GetText(const char* base, uint32_t id);
 const char* GetTextCompat(const char* base, uint32_t id);
 uint32_t    GetTextLength(const char* str);

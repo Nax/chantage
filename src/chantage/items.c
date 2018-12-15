@@ -67,6 +67,37 @@ void InitItems(void)
         gItemRegistry.items[i].name[0]++; // DEBUG
     }
 
+    /* Copy descriptions */
+    for (size_t i = 0; i < 0x13c; ++i)
+    {
+        strBase = GetText((const char*)0x08ab027b, i);
+        strLength = 0;
+        if (*strBase == (char)0xe3)
+        {
+            while (*strBase != (char)0xf8)
+                strBase++;
+            strBase++;
+        }
+        for (;;)
+        {
+            if (strBase[strLength] == (char)0xfe || strBase[strLength] == (char)0xff)
+                break;
+            if (strBase[strLength] == (char)0xe3 || strBase[strLength + 1] == (char)0x08)
+                break;
+            strLength++;
+        }
+        while (strLength)
+        {
+            if (strBase[strLength - 1] == (char)0xf8)
+                strLength--;
+            else
+                break;
+        }
+        gItemRegistry.items[i].desc = malloc(strLength + 1);
+        memcpy(gItemRegistry.items[i].desc, strBase, strLength);
+        gItemRegistry.items[i].desc[strLength] = 0xfe;
+    }
+
     /* Copy weapon data */
     for (size_t i = 0; i < 0x80; ++i)
         memcpy(&gItemRegistry.items[i].weapon, ((ItemWeaponData*)0x08b29e88) + i, sizeof(ItemWeaponData));
@@ -123,7 +154,7 @@ const char* GetItemName(u16 itemID)
 
 const char* GetItemDescription(u16 itemID)
 {
-    return "\x0a\x0a\x0a\xfe";
+    return gItemRegistry.items[itemID].desc;
 }
 
 ItemData* GetItemData(u16 itemID)
