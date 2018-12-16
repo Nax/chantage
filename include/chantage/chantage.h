@@ -15,6 +15,8 @@
 # define PACKED
 #endif
 
+#define BREAKPOINT      __asm__ __volatile__ ("break\r\n");
+
 typedef struct {
     u8      palette;
     u8      gfx;

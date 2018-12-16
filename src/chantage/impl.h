@@ -1,7 +1,5 @@
 #include <chantage/chantage.h>
 
-#define BREAKPOINT      __asm__ __volatile__ ("break\r\n");
-
 typedef struct {
     size_t      size;
     size_t      capacity;

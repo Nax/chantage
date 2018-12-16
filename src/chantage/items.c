@@ -44,7 +44,7 @@ void InitItems(void)
     /* Init the registry */
     registry->itemSize = 0x13c;
     registry->itemCapacity = 0x13c;
-    registry->data = malloc(sizeof(ItemData) * registry->itemCapacity);
+    registry->data = SystemAlloc(sizeof(ItemData) * registry->itemCapacity);
     memset(registry->data, 0, sizeof(ItemData) * registry->itemCapacity);
 
     /* Copy basic item data */
@@ -233,10 +233,10 @@ u16 CreateItem(void)
     {
         newCapacity = gContext.items.itemCapacity;
         newCapacity += newCapacity / 2;
-        newData = malloc(newCapacity * sizeof(ItemData));
+        newData = SystemAlloc(newCapacity * sizeof(ItemData));
         memcpy(newData, gContext.items.data, gContext.items.itemSize * sizeof(ItemData));
         memset(newData + gContext.items.itemSize, 0, newCapacity - gContext.items.itemCapacity);
-        free(gContext.items.data);
+        SystemFree(gContext.items.data);
         gContext.items.data = newData;
         gContext.items.itemCapacity = newCapacity;
     }
