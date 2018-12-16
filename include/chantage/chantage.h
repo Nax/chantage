@@ -1,6 +1,7 @@
 #ifndef CHANTAGE_H
 #define CHANTAGE_H
 
+#include <chantage/types.h>
 #include <chantage/psp.h>
 #include <chantage/psp_module_info.h>
 
@@ -13,14 +14,6 @@
 #else
 # define PACKED
 #endif
-
-typedef int8_t      i8;
-typedef int16_t     i16;
-typedef int32_t     i32;
-
-typedef uint8_t     u8;
-typedef uint16_t    u16;
-typedef uint32_t    u32;
 
 typedef struct {
     u8      palette;

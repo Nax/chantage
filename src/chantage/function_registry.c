@@ -1,25 +1,13 @@
 #include <chantage/impl.h>
 
-typedef struct {
-    size_t      size;
-    size_t      capacity;
-    size_t      strSize;
-    size_t      strCapacity;
-    char*       strTable;
-    uint32_t*   offTable;
-    void**      fnTable;
-} FunctionRegistry;
-
-static FunctionRegistry gFunctionRegistry;
-
 static int _GetRegistryIndex(size_t* dst, const char* str)
 {
     size_t max;
 
-    max = gFunctionRegistry.size;
+    max = gContext.functions.size;
     for (size_t i = 0; i < max; ++i)
     {
-        if (strcmp(str, gFunctionRegistry.strTable + gFunctionRegistry.offTable[i]) == 0)
+        if (strcmp(str, gContext.functions.strTable + gContext.functions.offTable[i]) == 0)
         {
             *dst = i;
             return 1;
@@ -30,13 +18,16 @@ static int _GetRegistryIndex(size_t* dst, const char* str)
 
 void InitFunctionRegistry()
 {
-    gFunctionRegistry.size = 0;
-    gFunctionRegistry.capacity = 8;
-    gFunctionRegistry.strSize = 0;
-    gFunctionRegistry.strCapacity = 64;
-    gFunctionRegistry.strTable = malloc(gFunctionRegistry.strCapacity);
-    gFunctionRegistry.offTable = malloc(gFunctionRegistry.capacity * sizeof(uint32_t));
-    gFunctionRegistry.fnTable = malloc(gFunctionRegistry.capacity * sizeof(void*));
+    ChantageFunctionRegistry* registry;
+
+    registry = &gContext.functions;
+    registry->size = 0;
+    registry->capacity = 8;
+    registry->strSize = 0;
+    registry->strCapacity = 64;
+    registry->strTable = malloc(registry->strCapacity);
+    registry->offTable = malloc(registry->capacity * sizeof(uint32_t));
+    registry->fnTable = malloc(registry->capacity * sizeof(void*));
 }
 
 void* LoadFunction(const char* str)
@@ -44,12 +35,13 @@ void* LoadFunction(const char* str)
     size_t index;
 
     if (_GetRegistryIndex(&index, str))
-        return gFunctionRegistry.fnTable[index];
+        return gContext.functions.fnTable[index];
     return NULL;
 }
 
 void* RegisterFunction(const char* str, void* fn)
 {
+    ChantageFunctionRegistry* registry;
     void* old;
     size_t index;
     size_t len;
@@ -57,47 +49,48 @@ void* RegisterFunction(const char* str, void* fn)
     void* newPtr;
     uint32_t off;
 
+    registry = &gContext.functions;
     if (_GetRegistryIndex(&index, str))
     {
-        old = gFunctionRegistry.fnTable[index];
-        gFunctionRegistry.fnTable[index] = fn;
+        old = registry->fnTable[index];
+        registry->fnTable[index] = fn;
 
         return old;
     }
 
     /* The function is not registered yet, let's register it */
     len = strlen(str) + 1;
-    while (gFunctionRegistry.strSize + len > gFunctionRegistry.strCapacity)
+    while (registry->strSize + len > registry->strCapacity)
     {
-        newCapacity = gFunctionRegistry.strCapacity;
+        newCapacity = registry->strCapacity;
         newCapacity += newCapacity / 2;
         newPtr = malloc(newCapacity);
-        memcpy(newPtr, gFunctionRegistry.strTable, gFunctionRegistry.strSize);
-        free(gFunctionRegistry.strTable);
-        gFunctionRegistry.strTable = newPtr;
-        gFunctionRegistry.strCapacity = newCapacity;
+        memcpy(newPtr, registry->strTable, registry->strSize);
+        free(registry->strTable);
+        registry->strTable = newPtr;
+        registry->strCapacity = newCapacity;
     }
-    off = gFunctionRegistry.strSize;
-    memcpy(gFunctionRegistry.strTable + off, str, len);
-    gFunctionRegistry.strSize += len;
+    off = registry->strSize;
+    memcpy(registry->strTable + off, str, len);
+    registry->strSize += len;
 
-    while (gFunctionRegistry.size >= gFunctionRegistry.capacity)
+    while (registry->size >= registry->capacity)
     {
-        newCapacity = gFunctionRegistry.capacity;
+        newCapacity = registry->capacity;
         newCapacity += newCapacity / 2;
         newPtr = malloc(newCapacity * sizeof(uint32_t));
-        memcpy(newPtr, gFunctionRegistry.offTable, gFunctionRegistry.size * sizeof(uint32_t));
-        free(gFunctionRegistry.offTable);
-        gFunctionRegistry.offTable = newPtr;
+        memcpy(newPtr, registry->offTable, registry->size * sizeof(uint32_t));
+        free(registry->offTable);
+        registry->offTable = newPtr;
         newPtr = malloc(newCapacity * sizeof(void*));
-        memcpy(newPtr, gFunctionRegistry.fnTable, gFunctionRegistry.size * sizeof(void*));
-        free(gFunctionRegistry.fnTable);
-        gFunctionRegistry.fnTable = newPtr;
-        gFunctionRegistry.capacity = newCapacity;
+        memcpy(newPtr, registry->fnTable, registry->size * sizeof(void*));
+        free(registry->fnTable);
+        registry->fnTable = newPtr;
+        registry->capacity = newCapacity;
     }
-    index = gFunctionRegistry.size;
-    gFunctionRegistry.offTable[index] = off;
-    gFunctionRegistry.fnTable[index] = fn;
-    gFunctionRegistry.size++;
+    index = registry->size;
+    registry->offTable[index] = off;
+    registry->fnTable[index] = fn;
+    registry->size++;
     return NULL;
 }

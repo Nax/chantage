@@ -15,7 +15,7 @@ typedef struct
     uint32_t    x;
     uint32_t    y;
     uint32_t    unk3;
-} __attribute__ ((packed)) TextureDescriptor;
+} PACKED TextureDescriptor;
 
 typedef void (*pfnCreateDrawContext)(uint32_t);
 typedef uint32_t (*pfnLoadTextureDescriptor)(TextureDescriptor*, void*);

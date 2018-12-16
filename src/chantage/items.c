@@ -1,11 +1,5 @@
 #include <chantage/impl.h>
 
-static struct {
-    size_t      itemSize;
-    size_t      itemCapacity;
-    ItemData*   items;
-} gItemRegistry;
-
 static const u32 gPatchList[] = {
     0x08878d5c,
     0x08883700,
@@ -41,30 +35,33 @@ static const u32 gPatchList[] = {
 
 void InitItems(void)
 {
+    ChantageItemRegistry* registry;
+
+    registry = &gContext.items;
     const char* strBase;
     uint32_t    strLength;
 
     /* Init the registry */
-    gItemRegistry.itemSize = 0x13c;
-    gItemRegistry.itemCapacity = 0x13c;
-    gItemRegistry.items = malloc(sizeof(ItemData) * gItemRegistry.itemCapacity);
-    memset(gItemRegistry.items, 0, sizeof(ItemData) * gItemRegistry.itemCapacity);
+    registry->itemSize = 0x13c;
+    registry->itemCapacity = 0x13c;
+    registry->data = malloc(sizeof(ItemData) * registry->itemCapacity);
+    memset(registry->data, 0, sizeof(ItemData) * registry->itemCapacity);
 
     /* Copy basic item data */
     for (size_t i = 0; i < 0x100; ++i)
-        memcpy(&gItemRegistry.items[i].basic, ((ItemBasicData*)0x08b29288) + i, sizeof(ItemBasicData));
+        memcpy(&registry->data[i].basic, ((ItemBasicData*)0x08b29288) + i, sizeof(ItemBasicData));
     for (size_t i = 0; i < 0x3c; ++i)
-        memcpy(&gItemRegistry.items[0x100 + i].basic, ((ItemBasicData*)0x08a5adac) + i, sizeof(ItemBasicData));
+        memcpy(&registry->data[0x100 + i].basic, ((ItemBasicData*)0x08a5adac) + i, sizeof(ItemBasicData));
 
     /* Copy names */
     strBase = (const char*)(0x08a935fd);
     for (size_t i = 0; i < 0x13c; ++i)
     {
         strLength = GetTextLength(strBase) + 1;
-        gItemRegistry.items[i].name = malloc(strLength);
-        memcpy(gItemRegistry.items[i].name, strBase, strLength);
+        registry->data[i].name = malloc(strLength);
+        memcpy(registry->data[i].name, strBase, strLength);
         strBase += strLength;
-        gItemRegistry.items[i].name[0]++; // DEBUG
+        registry->data[i].name[0]++; // DEBUG
     }
 
     /* Copy descriptions */
@@ -93,42 +90,42 @@ void InitItems(void)
             else
                 break;
         }
-        gItemRegistry.items[i].desc = malloc(strLength + 1);
-        memcpy(gItemRegistry.items[i].desc, strBase, strLength);
-        gItemRegistry.items[i].desc[strLength] = 0xfe;
+        registry->data[i].desc = malloc(strLength + 1);
+        memcpy(registry->data[i].desc, strBase, strLength);
+        registry->data[i].desc[strLength] = 0xfe;
     }
 
     /* Copy weapon data */
     for (size_t i = 0; i < 0x80; ++i)
-        memcpy(&gItemRegistry.items[i].weapon, ((ItemWeaponData*)0x08b29e88) + i, sizeof(ItemWeaponData));
+        memcpy(&registry->data[i].weapon, ((ItemWeaponData*)0x08b29e88) + i, sizeof(ItemWeaponData));
     for (size_t i = 0; i < 0x16; ++i)
-        memcpy(&gItemRegistry.items[0x100 + i].weapon, ((ItemWeaponData*)0x08a5b07c) + i, sizeof(ItemWeaponData));
+        memcpy(&registry->data[0x100 + i].weapon, ((ItemWeaponData*)0x08a5b07c) + i, sizeof(ItemWeaponData));
 
     /* Copy shield data */
     for (size_t i = 0; i < 0x10; ++i)
-        memcpy(&gItemRegistry.items[0x80 + i].block, ((ItemBlockData*)0x08b2a288) + i, sizeof(ItemBlockData));
+        memcpy(&registry->data[0x80 + i].block, ((ItemBlockData*)0x08b2a288) + i, sizeof(ItemBlockData));
     for (size_t i = 0; i < 0x2; ++i)
-        memcpy(&gItemRegistry.items[0x120 + i].block, ((ItemBlockData*)0x08a5b17c) + i, sizeof(ItemBlockData));
+        memcpy(&registry->data[0x120 + i].block, ((ItemBlockData*)0x08a5b17c) + i, sizeof(ItemBlockData));
 
     /* Copy armor data */
     for (size_t i = 0; i < 0x40; ++i)
-        memcpy(&gItemRegistry.items[0x90 + i].armor, ((ItemArmorData*)0x08b2a2a8) + i, sizeof(ItemArmorData));
+        memcpy(&registry->data[0x90 + i].armor, ((ItemArmorData*)0x08b2a2a8) + i, sizeof(ItemArmorData));
     for (size_t i = 0; i < 0xe; ++i)
-        memcpy(&gItemRegistry.items[0x124 + i].armor, ((ItemArmorData*)0x08a5b184) + i, sizeof(ItemArmorData));
+        memcpy(&registry->data[0x124 + i].armor, ((ItemArmorData*)0x08a5b184) + i, sizeof(ItemArmorData));
 
     /* Copy accessory data */
     for (size_t i = 0; i < 0x20; ++i)
-        memcpy(&gItemRegistry.items[0xd0 + i].accessory, ((ItemBlockData*)0x08b2a328) + i, sizeof(ItemBlockData));
+        memcpy(&registry->data[0xd0 + i].accessory, ((ItemBlockData*)0x08b2a328) + i, sizeof(ItemBlockData));
 
     /* Copy chemist data */
     for (size_t i = 0; i < 0xe; ++i)
-        memcpy(&gItemRegistry.items[0xf0 + i].chemist, ((ItemChemistData*)0x08b2a368) + i, sizeof(ItemChemistData));
+        memcpy(&registry->data[0xf0 + i].chemist, ((ItemChemistData*)0x08b2a368) + i, sizeof(ItemChemistData));
 
     /* Copy item attributes */
     for (size_t i = 0; i < 0x13c; ++i)
     {
         ItemAttributes* attr;
-        ItemData* item = gItemRegistry.items + i;
+        ItemData* item = registry->data + i;
         u16 attrID = item->basic.attrID;
 
         if (attrID >= 0x50)
@@ -149,24 +146,24 @@ void InitItems(void)
 
 const char* GetItemName(u16 itemID)
 {
-    return gItemRegistry.items[itemID].name;
+    return gContext.items.data[itemID].name;
 }
 
 const char* GetItemDescription(u16 itemID)
 {
-    return gItemRegistry.items[itemID].desc;
+    return gContext.items.data[itemID].desc;
 }
 
 ItemData* GetItemData(u16 itemID)
 {
-    return gItemRegistry.items + itemID;
+    return gContext.items.data + itemID;
 }
 
 ItemWeaponData* GetItemWeaponData(u16 itemID)
 {
-    if (itemID >= gItemRegistry.itemSize)
+    if (itemID >= gContext.items.itemSize)
         return NULL;
-    ItemData* item = &gItemRegistry.items[itemID];
+    ItemData* item = &gContext.items.data[itemID];
     if (item->basic.flags & 0x80)
         return &item->weapon;
     return NULL;
@@ -174,9 +171,9 @@ ItemWeaponData* GetItemWeaponData(u16 itemID)
 
 ItemBlockData* GetItemShieldData(u16 itemID)
 {
-    if (itemID >= gItemRegistry.itemSize)
+    if (itemID >= gContext.items.itemSize)
         return NULL;
-    ItemData* item = &gItemRegistry.items[itemID];
+    ItemData* item = &gContext.items.data[itemID];
     if (item->basic.flags & 0x40)
         return &item->block;
     return NULL;
@@ -184,9 +181,9 @@ ItemBlockData* GetItemShieldData(u16 itemID)
 
 ItemArmorData* GetItemArmorData(u16 itemID)
 {
-    if (itemID >= gItemRegistry.itemSize)
+    if (itemID >= gContext.items.itemSize)
         return NULL;
-    ItemData* item = &gItemRegistry.items[itemID];
+    ItemData* item = &gContext.items.data[itemID];
     if (item->basic.flags & 0x30)
         return &item->armor;
     return NULL;
@@ -194,9 +191,9 @@ ItemArmorData* GetItemArmorData(u16 itemID)
 
 ItemBlockData* GetItemAccessoryData(u16 itemID)
 {
-    if (itemID >= gItemRegistry.itemSize)
+    if (itemID >= gContext.items.itemSize)
         return NULL;
-    ItemData* item = &gItemRegistry.items[itemID];
+    ItemData* item = &gContext.items.data[itemID];
     if (item->basic.flags & 0x08)
         return &item->accessory;
     return NULL;
@@ -204,9 +201,9 @@ ItemBlockData* GetItemAccessoryData(u16 itemID)
 
 ItemChemistData* GetItemChemistData(u16 itemID)
 {
-    if (itemID >= gItemRegistry.itemSize)
+    if (itemID >= gContext.items.itemSize)
         return NULL;
-    ItemData* item = &gItemRegistry.items[itemID];
+    ItemData* item = &gContext.items.data[itemID];
     if (!(item->basic.flags & 0xf8))
         return &item->chemist;
     return NULL;
@@ -223,7 +220,7 @@ int IsItemValid(u16 itemID)
 
 size_t ItemCount(void)
 {
-    return gItemRegistry.itemSize;
+    return gContext.items.itemSize;
 }
 
 u16 CreateItem(void)
@@ -232,19 +229,19 @@ u16 CreateItem(void)
     ItemData* newData;
     u16 itemID;
 
-    if (gItemRegistry.itemSize == gItemRegistry.itemCapacity)
+    if (gContext.items.itemSize == gContext.items.itemCapacity)
     {
-        newCapacity = gItemRegistry.itemCapacity;
+        newCapacity = gContext.items.itemCapacity;
         newCapacity += newCapacity / 2;
         newData = malloc(newCapacity * sizeof(ItemData));
-        memcpy(newData, gItemRegistry.items, gItemRegistry.itemSize * sizeof(ItemData));
-        memset(newData + gItemRegistry.itemSize, 0, newCapacity - gItemRegistry.itemCapacity);
-        free(gItemRegistry.items);
-        gItemRegistry.items = newData;
-        gItemRegistry.itemCapacity = newCapacity;
+        memcpy(newData, gContext.items.data, gContext.items.itemSize * sizeof(ItemData));
+        memset(newData + gContext.items.itemSize, 0, newCapacity - gContext.items.itemCapacity);
+        free(gContext.items.data);
+        gContext.items.data = newData;
+        gContext.items.itemCapacity = newCapacity;
     }
-    itemID = gItemRegistry.itemSize;
-    gItemRegistry.itemSize++;
+    itemID = gContext.items.itemSize;
+    gContext.items.itemSize++;
     for (size_t i = 0; i < (sizeof(gPatchList) / sizeof(*gPatchList)); ++i)
     {
         *((u16*)gPatchList[i]) = (u16)ItemCount();

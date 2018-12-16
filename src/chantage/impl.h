@@ -2,6 +2,29 @@
 
 #define BREAKPOINT      __asm__ __volatile__ ("break\r\n");
 
+typedef struct {
+    size_t      size;
+    size_t      capacity;
+    size_t      strSize;
+    size_t      strCapacity;
+    char*       strTable;
+    uint32_t*   offTable;
+    void**      fnTable;
+} ChantageFunctionRegistry;
+
+typedef struct {
+    size_t      itemSize;
+    size_t      itemCapacity;
+    ItemData*   data;
+} ChantageItemRegistry;
+
+typedef struct {
+    ChantageFunctionRegistry    functions;
+    ChantageItemRegistry        items;
+} ChantageContext;
+
+extern ChantageContext gContext;
+
 typedef void (Mod)(PFNLOADFUNCTIONPROC*);
 
 void    LoadMods();
