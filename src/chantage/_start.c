@@ -10,6 +10,7 @@ void _start()
 {
     InitFunctionRegistry();
     InitItems();
+    InitInventory();
     InitText();
     HookFunctions();
     HookTitleScreen();

@@ -21,6 +21,7 @@ typedef struct {
 typedef struct {
     ChantageFunctionRegistry    functions;
     ChantageItemRegistry        items;
+    u8*                         inventory;
 } ChantageContext;
 
 extern ChantageContext gContext;
@@ -62,3 +63,8 @@ void        InitText(void);
 const char* GetText(const char* base, uint32_t id);
 const char* GetTextCompat(const char* base, uint32_t id);
 uint32_t    GetTextLength(const char* str);
+
+/*
+ * Inventory
+ */
+void        InitInventory(void);
