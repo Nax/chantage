@@ -37,5 +37,11 @@ void    sceIoClose(SceUID fd);
 SceUID  sceIoOpen(const char* path, int flags, SceMode mode);
 SceOff  sceIoLseek(SceUID fd, SceOff off, int whence);
 void    sceKernelDcacheWritebackRange(void* base, size_t size);
+SceUID  sceKernelAllocPartitionMemory(SceUID partitionId, const char* name, int type, size_t size, void* addr);
+int     sceKernelFreePartitionMemory(SceUID blockId);
+void*   sceKernelGetBlockHeadAddr(SceUID blockid);
+
+void*   SystemAlloc(size_t size);
+void    SystemFree(void* ptr);
 
 #endif

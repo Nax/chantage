@@ -83,3 +83,18 @@ sceIoLseek:
 sceKernelDcacheWritebackRange:
     j 0x08a4b134
     nop
+
+.globl sceKernelAllocPartitionMemory
+sceKernelAllocPartitionMemory:
+    j 0x08A4AFEC
+    nop
+
+.globl sceKernelFreePartitionMemory
+sceKernelFreePartitionMemory:
+    j 0x08A4B004
+    nop
+
+.globl sceKernelGetBlockHeadAddr
+sceKernelGetBlockHeadAddr:
+    j 0x08A4AFFC
+    nop

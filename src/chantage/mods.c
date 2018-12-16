@@ -54,9 +54,12 @@ void LoadMods()
             }
             strBuffer[i + j] = 0;
             fd = sceIoOpen(strBuffer, SCE_O_RDONLY, 0777);
-            mod = prxLoad(fd);
-            sceIoClose(fd);
-            mod(&LoadFunction);
+            if (fd >= 0)
+            {
+                mod = prxLoad(fd);
+                sceIoClose(fd);
+                mod(&LoadFunction);
+            }
         }
         for (;;)
         {

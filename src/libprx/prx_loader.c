@@ -1,5 +1,9 @@
 #include <chantage/prx.h>
 
+#define BREAKPOINT  __asm__ __volatile__ ("break\r\n")
+
+static const unsigned char sElfSignature[] = { 0x7f, 0x45, 0x4c, 0x46 };
+
 void* prxLoad(SceUID fd)
 {
     char* segments[32];
@@ -21,6 +25,11 @@ void* prxLoad(SceUID fd)
     segCount = 0;
     sceIoRead(fd, &ehdr, sizeof(ehdr));
 
+    if (memcmp(ehdr.e_ident, sElfSignature, 4) != 0)
+    {
+        BREAKPOINT;
+    }
+
     /* Load the actual segments */
     for (int i = 0; i < ehdr.e_phnum; ++i)
     {
@@ -30,7 +39,7 @@ void* prxLoad(SceUID fd)
         if (phdr.p_type != PT_LOAD)
             continue;
 
-        tmp = malloc(phdr.p_memsz + 0xfff);
+        tmp = SystemAlloc(phdr.p_memsz);
         sceIoLseek(fd, phdr.p_offset, SEEK_SET);
         sceIoRead(fd, tmp, phdr.p_filesz);
         for (Elf32_Word i = phdr.p_filesz; i < phdr.p_memsz; ++i)

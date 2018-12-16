@@ -14,5 +14,5 @@ void _start()
     InitText();
     HookFunctions();
     HookTitleScreen();
-    //LoadMods();
+    LoadMods();
 }
