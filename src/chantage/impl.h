@@ -10,6 +10,9 @@ void*   LoadFunction(const char* str);
 void*   RegisterFunction(const char* str, void* fn);
 void    HookFunctions();
 void    ReplaceFunction(void* existingFunction, const void* newFunction);
+void    ReplaceHi16(void* dst, const void* newPtr);
+void    ReplaceLo16(void* dst, const void* newPtr);
+void    ReplaceLoadAddress(void* dst, const void* newPtr);
 
 /*
  * items.c
