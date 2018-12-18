@@ -142,6 +142,8 @@ void InitItems(void)
     ReplaceFunction((void*)0x08a18740, &GetItemAccessoryData);
     ReplaceFunction((void*)0x08a18780, &GetItemChemistData);
     ReplaceFunction((void*)0x08a18dc0, &IsItemValid);
+    ReplaceFunction((void*)0x08A18E40, &IsItemInCategory);
+    ReplaceFunction((void*)0x08A18F40, &IsItemInCategory);
 }
 
 const char* GetItemName(u16 itemID)
@@ -207,6 +209,25 @@ ItemChemistData* GetItemChemistData(u16 itemID)
     if (!(item->basic.flags & 0xf8))
         return &item->chemist;
     return NULL;
+}
+
+int IsItemInCategory(u16 itemID, int category)
+{
+    ItemData* item = &gContext.items.data[itemID];
+    switch (category)
+    {
+    case 0:
+        return !!(item->basic.flags & 0x80) && (item->basic.type != 33 && item->basic.type != 32);
+    case 2:
+        return !!(item->basic.flags & 0x40);
+    case 3:
+        return !!(item->basic.flags & 0x20);
+    case 4:
+        return !!(item->basic.flags & 0x10);
+    case 5:
+        return !!(item->basic.flags & 0x08);
+    }
+    return 0;
 }
 
 int IsItemValid(u16 itemID)

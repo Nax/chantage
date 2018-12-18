@@ -49,6 +49,7 @@ ItemBlockData*      GetItemShieldData(u16 itemID);
 ItemArmorData*      GetItemArmorData(u16 itemID);
 ItemBlockData*      GetItemAccessoryData(u16 itemID);
 ItemChemistData*    GetItemChemistData(u16 itemID);
+int                 IsItemInCategory(u16 itemID, int category);
 int                 IsItemValid(u16 itemID);
 size_t              ItemCount(void);
 u16                 CreateItem(void);
