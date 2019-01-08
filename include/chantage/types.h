@@ -14,4 +14,12 @@ typedef uint16_t    u16;
 typedef uint32_t    u32;
 typedef uint64_t    u64;
 
+typedef u32         usize;
+typedef u32         uword;
+typedef u64         uoff;
+
+typedef i32         isize;
+typedef i32         iword;
+typedef i64         ioff;
+
 #endif
