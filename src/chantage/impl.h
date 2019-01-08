@@ -1,19 +1,21 @@
 #include <chantage/chantage.h>
 
 typedef struct {
-    size_t      size;
-    size_t      capacity;
-    size_t      strSize;
-    size_t      strCapacity;
+    usize       size;
+    usize       capacity;
+    usize       strSize;
+    usize       strCapacity;
     char*       strTable;
-    uint32_t*   offTable;
+    u32*        offTable;
     void**      fnTable;
 } ChantageFunctionRegistry;
 
 typedef struct {
-    size_t      itemSize;
-    size_t      itemCapacity;
+    usize       itemSize;
+    usize       itemCapacity;
     ItemData*   data;
+    char*       names;
+    usize       namesSize;
 } ChantageItemRegistry;
 
 typedef struct {
@@ -51,7 +53,7 @@ ItemBlockData*      GetItemAccessoryData(u16 itemID);
 ItemChemistData*    GetItemChemistData(u16 itemID);
 int                 IsItemInCategory(u16 itemID, int category);
 int                 IsItemValid(u16 itemID);
-size_t              ItemCount(void);
+usize               ItemCount(void);
 u16                 CreateItem(void);
 
 /*
@@ -59,9 +61,9 @@ u16                 CreateItem(void);
  */
 
 void        InitText(void);
-const char* GetText(const char* base, uint32_t id);
-const char* GetTextCompat(const char* base, uint32_t id);
-uint32_t    GetTextLength(const char* str);
+const char* GetText(const char* base, u32 id);
+const char* GetTextCompat(const char* base, u32 id);
+u32         GetTextLength(const char* str);
 
 /*
  * Inventory

@@ -33,6 +33,32 @@ static const u32 gPatchList[] = {
     0x08a34770
 };
 
+static void ReplaceItemName(u16 itemID, const char* name)
+{
+    ChantageItemRegistry* registry;
+    const char* oldBase;
+    const char* oldBase2;
+    u32 oldLen;
+    u32 nameLen;
+    usize newLen;
+    char* newNames;
+
+    registry = &gContext.items;
+    nameLen = GetTextLength(name);
+    oldBase = GetText(registry->names, itemID);
+    oldLen = GetTextLength(oldBase);
+    oldBase2 = oldBase + oldLen + 1;
+
+    newLen = registry->namesSize - oldLen + nameLen;
+    newNames = malloc(newLen);
+    memcpy(newNames, registry->names, oldBase - registry->names);
+    memcpy(newNames + (oldBase - registry->names), name, nameLen + 1);
+    memcpy(newNames + (oldBase - registry->names) + nameLen + 1, oldBase2, registry->namesSize - (oldBase2 - registry->names));
+    free(registry->names);
+    registry->names = newNames;
+    registry->namesSize = newLen;
+}
+
 void InitItems(void)
 {
     ChantageItemRegistry* registry;
@@ -55,14 +81,13 @@ void InitItems(void)
 
     /* Copy names */
     strBase = (const char*)(0x08a935fd);
-    for (size_t i = 0; i < 0x13c; ++i)
-    {
-        strLength = GetTextLength(strBase) + 1;
-        registry->data[i].name = malloc(strLength);
-        memcpy(registry->data[i].name, strBase, strLength);
-        strBase += strLength;
-        registry->data[i].name[0]++; // DEBUG
-    }
+    strLength = (GetText(strBase, 0x13b) - strBase) + GetTextLength(GetText(strBase, 0x13b)) + 1;
+    registry->names = malloc(strLength);
+    registry->namesSize = strLength;
+    memcpy(registry->names, strBase, strLength);
+
+    ReplaceItemName(0x6a, "\x13\x24\x39\x28\x2f\x2c\x31\x95\x12\x12\xfe");              // Javelin II
+    ReplaceItemName(0x8f, "\x0E\x36\x26\x38\x37\x26\x2b\x28\x32\x31\x95\x12\x12\xfe");  // Escutcheon II
 
     /* Copy descriptions */
     for (size_t i = 0; i < 0x13c; ++i)
@@ -148,7 +173,7 @@ void InitItems(void)
 
 const char* GetItemName(u16 itemID)
 {
-    return gContext.items.data[itemID].name;
+    return GetText(gContext.items.names, itemID);
 }
 
 const char* GetItemDescription(u16 itemID)
@@ -239,7 +264,7 @@ int IsItemValid(u16 itemID)
     return 1;
 }
 
-size_t ItemCount(void)
+usize ItemCount(void)
 {
     return gContext.items.itemSize;
 }
