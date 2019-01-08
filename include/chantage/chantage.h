@@ -1,21 +1,10 @@
 #ifndef CHANTAGE_H
 #define CHANTAGE_H
 
+#include <chantage/util.h>
 #include <chantage/types.h>
 #include <chantage/psp.h>
 #include <chantage/psp_module_info.h>
-
-/*
- * GCC is the only supported compiler,
- * this is mostly to fix static analysis.
- */
-#if defined(__GNUC__)
-# define PACKED  __attribute__ ((packed))
-#else
-# define PACKED
-#endif
-
-#define BREAKPOINT      __asm__ __volatile__ ("break\r\n");
 
 typedef struct {
     u8      palette;

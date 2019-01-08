@@ -1,8 +1,8 @@
-#ifndef PSP_H
-#define PSP_H
+#ifndef CHANTAGE_PSP_H
+#define CHANTAGE_PSP_H
 
-#include <stddef.h>
-#include <stdint.h>
+#include <chantage/util.h>
+#include <chantage/types.h>
 
 /*
  * LibChantage
@@ -14,9 +14,11 @@
 #define SEEK_CUR    1
 #define SEEK_END    2
 
-typedef uint32_t    SceUID;
-typedef uint32_t    SceMode;
-typedef int64_t     SceOff;
+typedef i32         SceUID;
+typedef u32         SceSize;
+typedef i32         SceSSize;
+typedef i32         SceMode;
+typedef i64         SceOff;
 
 void*   memset(void*, int, size_t);
 void*   memmove(void*, const void*, size_t);

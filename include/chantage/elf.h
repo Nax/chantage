@@ -1,46 +1,46 @@
-#ifndef _ELF_H
-#define _ELF_H
+#ifndef CHANTAGE_ELF_H
+#define CHANTAGE_ELF_H
 
 /* Based on linux efi.h */
+#include <chantage/util.h>
+#include <chantage/types.h>
 
-#include <stdint.h>
-
-#define EM_NONE     0
-#define EM_M32      1
-#define EM_SPARC    2
-#define EM_386      3
-#define EM_68K      4
-#define EM_88K      5
-#define EM_486      6   /* Perhaps disused */
-#define EM_860      7
-#define EM_MIPS     8   /* MIPS R3000 (officially, big-endian only) */
-#define EM_MIPS_RS3_LE  10  /* MIPS R3000 little-endian */
-#define EM_MIPS_RS4_BE  10  /* MIPS R4000 big-endian */
-#define EM_PARISC   15  /* HPPA */
-#define EM_SPARC32PLUS  18  /* Sun's "v8plus" */
-#define EM_PPC      20  /* PowerPC */
-#define EM_PPC64    21   /* PowerPC64 */
-#define EM_SPU      23  /* Cell BE SPU */
-#define EM_SH       42  /* SuperH */
-#define EM_SPARCV9  43  /* SPARC v9 64-bit */
-#define EM_IA_64    50  /* HP/Intel IA-64 */
-#define EM_X86_64   62  /* AMD x86-64 */
-#define EM_S390     22  /* IBM S/390 */
-#define EM_CRIS     76  /* Axis Communications 32-bit embedded processor */
-#define EM_V850     87  /* NEC v850 */
-#define EM_M32R     88  /* Renesas M32R */
-#define EM_H8_300   46  /* Renesas H8/300,300H,H8S */
-#define EM_MN10300  89  /* Panasonic/MEI MN10300, AM33 */
+#define EM_NONE         0
+#define EM_M32          1
+#define EM_SPARC        2
+#define EM_386          3
+#define EM_68K          4
+#define EM_88K          5
+#define EM_486          6       /* Perhaps disused */
+#define EM_860          7
+#define EM_MIPS         8       /* MIPS R3000 (officially, big-endian only) */
+#define EM_MIPS_RS3_LE  10      /* MIPS R3000 little-endian */
+#define EM_MIPS_RS4_BE  10      /* MIPS R4000 big-endian */
+#define EM_PARISC       15      /* HPPA */
+#define EM_SPARC32PLUS  18      /* Sun's "v8plus" */
+#define EM_PPC          20      /* PowerPC */
+#define EM_PPC64        21      /* PowerPC64 */
+#define EM_SPU          23      /* Cell BE SPU */
+#define EM_SH           42      /* SuperH */
+#define EM_SPARCV9      43      /* SPARC v9 64-bit */
+#define EM_IA_64        50      /* HP/Intel IA-64 */
+#define EM_X86_64       62      /* AMD x86-64 */
+#define EM_S390         22      /* IBM S/390 */
+#define EM_CRIS         76      /* Axis Communications 32-bit embedded processor */
+#define EM_V850         87      /* NEC v850 */
+#define EM_M32R         88      /* Renesas M32R */
+#define EM_H8_300       46      /* Renesas H8/300,300H,H8S */
+#define EM_MN10300      89      /* Panasonic/MEI MN10300, AM33 */
 #define EM_BLACKFIN     106     /* ADI Blackfin Processor */
-#define EM_FRV      0x5441  /* Fujitsu FR-V */
-#define EM_AVR32    0x18ad  /* Atmel AVR32 */
+#define EM_FRV          0x5441  /* Fujitsu FR-V */
+#define EM_AVR32        0x18ad  /* Atmel AVR32 */
 
 /* 32-bit ELF base types. */
-typedef uint32_t    Elf32_Addr;
-typedef uint16_t    Elf32_Half;
-typedef uint32_t    Elf32_Off;
-typedef int32_t     Elf32_Sword;
-typedef uint32_t    Elf32_Word;
+typedef u32     Elf32_Addr;
+typedef u16     Elf32_Half;
+typedef u32     Elf32_Off;
+typedef i32     Elf32_Sword;
+typedef u32     Elf32_Word;
 
 /* These constants are for the segment types stored in the image headers */
 #define PT_NULL         0
@@ -161,7 +161,7 @@ typedef struct {
         Elf32_Sword d_val;
         Elf32_Addr  d_ptr;
     } d_un;
-} Elf32_Dyn;
+} PACKED Elf32_Dyn;
 
 /* The following are used with relocations */
 #define ELF32_R_ADDR_BASE(i)    (((i) >> 16) & 0xFF)
@@ -186,14 +186,14 @@ typedef struct elf32_rel
 {
     Elf32_Addr  r_offset;
     Elf32_Word  r_info;
-} __attribute__ ((packed)) Elf32_Rel;
+} PACKED Elf32_Rel;
 
 typedef struct elf32_rela
 {
     Elf32_Addr  r_offset;
     Elf32_Word  r_info;
     Elf32_Sword r_addend;
-} Elf32_Rela;
+} PACKED Elf32_Rela;
 
 typedef struct elf32_sym
 {
@@ -203,7 +203,7 @@ typedef struct elf32_sym
     unsigned char   st_info;
     unsigned char   st_other;
     Elf32_Half  st_shndx;
-} Elf32_Sym;
+} PACKED Elf32_Sym;
 
 #define EI_NIDENT   16
 
@@ -223,7 +223,7 @@ typedef struct elf32_hdr
     Elf32_Half      e_shentsize;
     Elf32_Half      e_shnum;
     Elf32_Half      e_shstrndx;
-} __attribute__ ((packed)) Elf32_Ehdr;
+} PACKED Elf32_Ehdr;
 
 /* These constants define the permissions on sections in the program
    header, p_flags. */
@@ -241,7 +241,7 @@ typedef struct elf32_phdr
     Elf32_Word  p_memsz;
     Elf32_Word  p_flags;
     Elf32_Word  p_align;
-} __attribute__ ((packed)) Elf32_Phdr;
+} PACKED Elf32_Phdr;
 
 /* sh_type */
 #define SHT_NULL    0
@@ -291,7 +291,7 @@ typedef struct elf32_shdr {
     Elf32_Word  sh_info;
     Elf32_Word  sh_addralign;
     Elf32_Word  sh_entsize;
-} __attribute__ ((packed)) Elf32_Shdr;
+} PACKED Elf32_Shdr;
 
 #define EI_MAG0     0       /* e_ident[] indexes */
 #define EI_MAG1     1
@@ -336,6 +336,6 @@ typedef struct elf32_note
     Elf32_Word  n_namesz;   /* Name size */
     Elf32_Word  n_descsz;   /* Content size */
     Elf32_Word  n_type;     /* Content type */
-} Elf32_Nhdr;
+} PACKED Elf32_Nhdr;
 
 #endif

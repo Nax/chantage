@@ -1,7 +1,5 @@
 #include <chantage/prx.h>
 
-#define BREAKPOINT  __asm__ __volatile__ ("break\r\n")
-
 static const unsigned char sElfSignature[] = { 0x7f, 0x45, 0x4c, 0x46 };
 
 void* prxLoad(SceUID fd)

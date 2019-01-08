@@ -15,13 +15,17 @@ typedef struct _scemoduleinfo {
 
 typedef const _sceModuleInfo SceModuleInfo;
 
-#define PSP_MODULE_INFO(name, attributes, major_version, minor_version) \
-SceModuleInfo module_info                                               \
-        __attribute__((section(".rodata.sceModuleInfo"),                \
-            aligned(16), unused)) = {                                   \
-            attributes, { minor_version, major_version }, name, 0, 0,   \
-            0, 0,                                                       \
-            0, 0                                                        \
+#if defined(__GNUC__)
+# define PSP_MODULE_INFO(name, attributes, major_version, minor_version)    \
+SceModuleInfo module_info                                                   \
+        __attribute__((section(".rodata.sceModuleInfo"),                    \
+            aligned(16), unused)) = {                                       \
+            attributes, { minor_version, major_version }, name, 0, 0,       \
+            0, 0,                                                           \
+            0, 0                                                            \
 }
+#else
+# define PSP_MODULE_INFO(name, attributes, major_version, minor_version)
+#endif
 
 #endif

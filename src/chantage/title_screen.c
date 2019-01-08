@@ -1,20 +1,18 @@
 #include <chantage/impl.h>
 
-static uint8_t gTitleText[] = {
-#include "title_text.inc"
-};
+extern const u8 gTitleText[];
 
 typedef struct
 {
-    uint32_t    enabled;
-    uint32_t    textureID;
-    uint32_t    unk0;
-    uint32_t    unk1;
-    uint32_t    counter;
-    uint32_t    unk2;
-    uint32_t    x;
-    uint32_t    y;
-    uint32_t    unk3;
+    u32 enabled;
+    u32 textureID;
+    u32 unk0;
+    u32 unk1;
+    u32 counter;
+    u32 unk2;
+    u32 x;
+    u32 y;
+    u32 unk3;
 } PACKED TextureDescriptor;
 
 typedef void (*pfnCreateDrawContext)(uint32_t);
