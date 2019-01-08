@@ -19,7 +19,9 @@ To build:
     cd chantage
     mkdir build
     cd build
-    cmake .. -DCMAKE_BUILD_TYPE=Release -G "Unix Makefiles"
+    mkdir MinRelSize
+    cd MinRelSize
+    cmake ../.. -DCMAKE_BUILD_TYPE=MinRelSize -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=""
     make -j16
 
 To install for development (Windows, PPSSPP with installed.txt):
