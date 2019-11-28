@@ -89,6 +89,15 @@ void InitItems(void)
     ReplaceItemName(0x6a, "\x13\x24\x39\x28\x2f\x2c\x31\x95\x12\x12\xfe");              // Javelin II
     ReplaceItemName(0x8f, "\x0E\x36\x26\x38\x37\x26\x2b\x28\x32\x31\x95\x12\x12\xfe");  // Escutcheon II
 
+    /* DEBUG */
+    for (u16 itemID = 0; itemID < 0x13c; ++itemID)
+    {
+        strBase = GetText(registry->names, itemID);
+        if (strBase[0] != (char)0xfe)
+        {
+            ((char*)strBase)[0]++;
+        }
+    }
     /* Copy descriptions */
     for (size_t i = 0; i < 0x13c; ++i)
     {
